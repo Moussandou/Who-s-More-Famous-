@@ -21,7 +21,8 @@ export default function GameScreen({ navigation }: any) {
     const [lives, setLives] = useState(3);        // ✨ Système de vies (3 chances)
     const [revealed, setRevealed] = useState(false); // ✨ Révéler le nombre de fans
     const [loading, setLoading] = useState(true);   // est-ce qu'on charge ?
-    const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);   // 'correct' | 'wrong' | null
+    const [feedback1, setFeedback1] = useState<'correct' | 'wrong' | null>(null);
+    const [feedback2, setFeedback2] = useState<'correct' | 'wrong' | null>(null);
     const [error, setError] = useState<string | null>(null);   // message d'erreur API
 
     // useRef = une valeur qui persiste entre les renders SANS déclencher un re-render.
@@ -44,7 +45,8 @@ export default function GameScreen({ navigation }: any) {
         try {
             setLoading(true);
             setError(null);
-            setFeedback(null);
+            setFeedback1(null);
+            setFeedback2(null);
             setRevealed(false); // On cache les résultats pour le nouveau duel
 
             // 1. On s'assure que le pool est prêt (une seule fois par session)
@@ -69,16 +71,25 @@ export default function GameScreen({ navigation }: any) {
         if (!other) return; // Sécurité TypeScript
 
         const isCorrect = chosen.members >= other.members;
-        setRevealed(true); // ✨ On révèle les chiffres !
+        setRevealed(true); // On révèle les chiffres !
 
         if (isCorrect) {
             setScore(s => s + 1);
             setStreak(s => s + 1);
-            setFeedback('correct');
+            // On met en vert celui qui a été choisi
+            if (chosen === anime1) setFeedback1('correct');
+            else setFeedback2('correct');
         } else {
             setStreak(0);
-            setLives(l => l - 1); // ✨ On enlève une vie
-            setFeedback('wrong');
+            setLives(l => l - 1);
+            // Celui choisi est rouge, l'autre est vert (le bon choix)
+            if (chosen === anime1) {
+                setFeedback1('wrong');
+                setFeedback2('correct');
+            } else {
+                setFeedback2('wrong');
+                setFeedback1('correct');
+            }
         }
 
         // Après 1.5s (plus long pour laisser lire les chiffres)
@@ -171,7 +182,7 @@ export default function GameScreen({ navigation }: any) {
             <Animated.View style={[styles.duel, { opacity: fadeAnim }]}>
                 <AnimeCard
                     anime={anime1}
-                    feedback={feedback}
+                    feedback={feedback1}
                     revealed={revealed}
                     onPress={() => !revealed && handleChoice(anime1)}
                 />
@@ -180,7 +191,7 @@ export default function GameScreen({ navigation }: any) {
 
                 <AnimeCard
                     anime={anime2}
-                    feedback={feedback}
+                    feedback={feedback2}
                     revealed={revealed}
                     onPress={() => !revealed && handleChoice(anime2)}
                 />
