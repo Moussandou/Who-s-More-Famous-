@@ -99,7 +99,7 @@ export default function SettingsScreen({ navigation }: any) {
                 </View>
 
                 <View style={styles.footerInfo}>
-                    <Text style={styles.versionText}>WHO'S MORE FAMOUS V1.1.0</Text>
+                    <Text style={styles.versionText}>WHO'S MORE FAMOUS V2.0.0 'BINGEKI'</Text>
                     <Text style={styles.creditText}>{t('footer').toUpperCase()} BY MOUSSANDOU</Text>
                 </View>
             </ScrollView>
@@ -116,13 +116,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingTop: 60,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
     },
     backButton: {
-        width: 44,
-        height: 44,
-        borderWidth: 2,
+        width: 50,
+        height: 50,
+        borderWidth: 3,
         borderColor: THEME.colors.ink,
         backgroundColor: THEME.colors.white,
         justifyContent: 'center',
@@ -131,48 +131,50 @@ const styles = StyleSheet.create({
     },
     titleWrapper: {
         marginLeft: 20,
-        alignItems: 'flex-start',
     },
     headerTitle: {
         color: THEME.colors.ink,
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: '900',
+        letterSpacing: 1,
     },
     titleUnderline: {
-        height: 6,
+        height: 8,
         width: '100%',
         backgroundColor: THEME.colors.accent,
-        marginTop: -4,
+        marginTop: -10,
         zIndex: -1,
+        opacity: 0.3,
     },
     scrollContent: {
-        padding: 20,
+        padding: 24,
     },
     section: {
-        marginBottom: 30,
+        marginBottom: 32,
         backgroundColor: THEME.colors.white,
-        padding: 20,
-        borderWidth: THEME.borders.width,
+        padding: 24,
+        borderWidth: 4,
         borderColor: THEME.colors.ink,
         ...THEME.shadows.hard,
     },
     sectionTitle: {
         color: THEME.colors.gray,
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '900',
-        letterSpacing: 2,
-        marginBottom: 20,
+        letterSpacing: 4,
+        marginBottom: 24,
     },
     settingItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: 14,
     },
     settingItemDivider: {
-        height: 1,
-        backgroundColor: THEME.colors.paper,
-        marginVertical: 10,
+        height: 2,
+        backgroundColor: THEME.colors.ink,
+        marginVertical: 14,
+        opacity: 0.1,
     },
     settingTextContainer: {
         flexDirection: 'row',
@@ -180,49 +182,52 @@ const styles = StyleSheet.create({
     },
     settingLabel: {
         color: THEME.colors.ink,
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '900',
-        marginLeft: 12,
+        marginLeft: 14,
+        letterSpacing: 1,
     },
     segmentedContainer: {
         flexDirection: 'row',
         backgroundColor: THEME.colors.ink,
-        padding: 3,
+        padding: 4,
         borderWidth: 1,
         borderColor: THEME.colors.ink,
     },
     segBtn: {
-        paddingVertical: 6,
+        paddingVertical: 8,
         paddingHorizontal: 16,
     },
     segBtnActive: {
-        backgroundColor: THEME.colors.white,
+        backgroundColor: THEME.colors.accent,
     },
     segText: {
-        color: THEME.colors.paper,
-        fontSize: 11,
+        color: THEME.colors.white,
+        fontSize: 12,
         fontWeight: '900',
     },
     segTextActive: {
-        color: THEME.colors.ink,
+        color: THEME.colors.white,
     },
     footerInfo: {
         alignItems: 'center',
         marginTop: 20,
-        paddingBottom: 40,
+        paddingBottom: 60,
     },
     versionText: {
         color: THEME.colors.gray,
         fontSize: 10,
         fontWeight: '900',
-        letterSpacing: 1,
+        letterSpacing: 3,
     },
     creditText: {
-        color: THEME.colors.gray,
-        fontSize: 9,
-        marginTop: 4,
-        fontWeight: '700',
-        letterSpacing: 0.5,
+        color: THEME.colors.accent,
+        fontSize: 11,
+        marginTop: 6,
+        fontWeight: '900',
+        letterSpacing: 2,
     }
 });
+
+
 

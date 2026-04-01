@@ -7,12 +7,19 @@ let animePool: Anime[] = []; // Cache local des animés populaires
 /**
  * Initialise le pool d'animés.
  * @param difficulty 'classic' (200 animés) ou 'expert' (500 animés)
+ * @param onProgress Callback optionnel pour suivre la progression (0 à 1)
  */
-export async function initializePool(difficulty: 'classic' | 'expert' = 'classic'): Promise<void> {
+export async function initializePool(
+    difficulty: 'classic' | 'expert' = 'classic',
+    onProgress?: (progress: number) => void
+): Promise<void> {
     const pagesToFetch = difficulty === 'expert' ? 20 : 8; // 20*25=500 vs 8*25=200
     
     // Si le pool est déjà chargé avec AU MOINS le nombre requis, on ne fait rien
-    if (animePool.length >= pagesToFetch * 25) return;
+    if (animePool.length >= pagesToFetch * 25) {
+        onProgress?.(1);
+        return;
+    }
 
     const newPool: Anime[] = [];
 
@@ -44,6 +51,8 @@ export async function initializePool(difficulty: 'classic' | 'expert' = 'classic
                 });
             });
 
+            onProgress?.(page / pagesToFetch);
+
             // On attend 500ms entre chaque page pour ne pas brusquer l'API (limite 3/sec)
             await sleep(500);
         }
@@ -55,6 +64,7 @@ export async function initializePool(difficulty: 'classic' | 'expert' = 'classic
         throw error;
     }
 }
+
 
 /**
  * Pioche un duel aléatoirement dans le pool local.

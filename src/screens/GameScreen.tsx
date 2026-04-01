@@ -1,8 +1,9 @@
 import {
     View, Text, StyleSheet, TouchableOpacity,
-    ActivityIndicator, Animated
+    Animated, Dimensions
 } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { fetchDuel, initializePool } from '../services/jikanAPI';
 import { saveHighScore } from '../services/storage';
 import AnimeCard, { Anime } from '../components/AnimeCard';
@@ -21,6 +22,7 @@ export default function GameScreen({ navigation }: any) {
     const [lives, setLives] = useState(3);
     const [revealed, setRevealed] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [progress, setProgress] = useState(0);
     const [feedback1, setFeedback1] = useState<'correct' | 'wrong' | null>(null);
     const [feedback2, setFeedback2] = useState<'correct' | 'wrong' | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -39,8 +41,8 @@ export default function GameScreen({ navigation }: any) {
             setFeedback2(null);
             setRevealed(false);
 
-            await initializePool(settings.difficulty);
-
+            await initializePool(settings.difficulty, (p) => setProgress(p));
+            
             const { anime1, anime2 } = await fetchDuel();
             setAnime1(anime1);
             setAnime2(anime2);
@@ -51,6 +53,7 @@ export default function GameScreen({ navigation }: any) {
             setLoading(false);
         }
     }
+
 
     function handleChoice(chosen: Anime | null) {
         if (!chosen) return;
@@ -111,8 +114,18 @@ export default function GameScreen({ navigation }: any) {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator size="large" color={THEME.colors.ink} />
-                <Text style={styles.loadingText}>{t('loading').toUpperCase()}</Text>
+                <View style={styles.loadingBox}>
+                    <Text style={styles.loadingTitle}>{t('loading').toUpperCase()}</Text>
+                    <View style={styles.progressContainer}>
+                        <Animated.View 
+                            style={[
+                                styles.progressBar, 
+                                { width: `${progress * 100}%` }
+                            ]} 
+                        />
+                    </View>
+                    <Text style={styles.progressText}>{Math.round(progress * 100)}%</Text>
+                </View>
             </View>
         );
     }
@@ -143,19 +156,19 @@ export default function GameScreen({ navigation }: any) {
                 </View>
 
                 <View style={styles.centerHeader}>
-                    <Text style={styles.livesLabel}>LIVES</Text>
                     <View style={styles.livesContainer}>
-                        {[...Array(3)].map((_, i) => (
-                            <View 
-                                key={i} 
-                                style={[
-                                    styles.lifeBlock, 
-                                    i >= lives && styles.lifeBlockEmpty
-                                ]} 
+                        {[1, 2, 3].map((i) => (
+                            <Ionicons 
+                                key={i}
+                                name={i <= lives ? "heart" : "heart-outline"} 
+                                size={28} 
+                                color={i <= lives ? THEME.colors.accent : THEME.colors.gray}
+                                style={{ marginHorizontal: 2 }}
                             />
                         ))}
                     </View>
                 </View>
+
 
                 <View style={[styles.statBox, { alignItems: 'flex-end' }]}>
                     <Text style={styles.statLabel}>{t('streak').toUpperCase()}</Text>
@@ -171,7 +184,7 @@ export default function GameScreen({ navigation }: any) {
                     onPress={() => !revealed && handleChoice(anime1)}
                 />
 
-                <View style={styles.vsContainer}>
+                <View style={styles.vsBadge}>
                     <Text style={styles.vsText}>VS</Text>
                 </View>
 
@@ -202,47 +215,29 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        marginBottom: 30,
+        paddingHorizontal: 24,
+        marginBottom: 40,
     },
     statBox: {
         flex: 1,
     },
     statLabel: {
         color: THEME.colors.gray,
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '900',
-        letterSpacing: 1,
+        letterSpacing: 2,
     },
     statValue: {
         color: THEME.colors.ink,
-        fontSize: 22,
+        fontSize: 28,
         fontWeight: '900',
     },
     centerHeader: {
         alignItems: 'center',
-        marginHorizontal: 10,
-    },
-    livesLabel: {
-        fontSize: 9,
-        fontWeight: '900',
-        color: THEME.colors.gray,
-        letterSpacing: 2,
-        marginBottom: 4,
+        marginHorizontal: 12,
     },
     livesContainer: {
         flexDirection: 'row',
-    },
-    lifeBlock: {
-        width: 16,
-        height: 16,
-        backgroundColor: THEME.colors.ink,
-        marginHorizontal: 2,
-        borderWidth: 1,
-        borderColor: THEME.colors.ink,
-    },
-    lifeBlockEmpty: {
-        backgroundColor: 'transparent',
     },
     duel: {
         flexDirection: 'row',
@@ -250,32 +245,65 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 8,
     },
-    vsContainer: {
-        width: 40,
-        height: 40,
-        backgroundColor: THEME.colors.ink,
-        borderRadius: 20,
+    vsBadge: {
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        marginLeft: -28,
+        width: 56,
+        height: 56,
+        backgroundColor: THEME.colors.accent,
+        borderWidth: 4,
+        borderColor: THEME.colors.ink,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 20,
-        borderWidth: 3,
-        borderColor: THEME.colors.white,
-        marginHorizontal: -20,
+        zIndex: 100,
+        transform: [{ rotate: '45deg' }],
+        ...THEME.shadows.hard,
     },
     vsText: {
         color: THEME.colors.white,
+        fontSize: 20,
+        fontWeight: '900',
+        transform: [{ rotate: '-45deg' }],
+    },
+    loadingBox: {
+        width: Dimensions.get('window').width * 0.85,
+        padding: 32,
+        backgroundColor: THEME.colors.white,
+        borderWidth: 4,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
+        alignItems: 'center',
+    },
+    loadingTitle: {
+        color: THEME.colors.ink,
+        fontSize: 28,
+        fontWeight: '900',
+        letterSpacing: 4,
+        marginBottom: 24,
+    },
+
+    progressContainer: {
+        width: '100%',
+        height: 16,
+        backgroundColor: '#EEEEEE',
+        borderWidth: 2,
+        borderColor: THEME.colors.ink,
+        marginBottom: 12,
+    },
+    progressBar: {
+        height: '100%',
+        backgroundColor: THEME.colors.accent,
+    },
+    progressText: {
+        color: THEME.colors.gray,
         fontSize: 14,
         fontWeight: '900',
     },
-    loadingText: {
-        color: THEME.colors.ink,
-        marginTop: 16,
-        fontWeight: '900',
-        letterSpacing: 2,
-    },
     errorBox: {
-        padding: 30,
-        borderWidth: THEME.borders.width,
+        padding: 32,
+        borderWidth: 4,
         borderColor: THEME.colors.ink,
         backgroundColor: THEME.colors.white,
         ...THEME.shadows.hard,
@@ -284,26 +312,28 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: THEME.colors.accent,
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: '900',
-        marginBottom: 8,
+        marginBottom: 12,
     },
     errorDetail: {
         color: THEME.colors.gray,
         fontSize: 14,
-        marginBottom: 20,
+        marginBottom: 24,
         textAlign: 'center',
     },
     retryBtn: {
-        backgroundColor: THEME.colors.ink,
-        paddingVertical: 12,
-        paddingHorizontal: 30,
-        borderWidth: 2,
+        backgroundColor: THEME.colors.accent,
+        paddingVertical: 14,
+        paddingHorizontal: 36,
+        borderWidth: 3,
         borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
     },
     retryBtnText: {
-        color: THEME.colors.paper,
+        color: THEME.colors.white,
         fontWeight: '900',
-        letterSpacing: 1,
+        fontSize: 16,
+        letterSpacing: 2,
     },
 });

@@ -1,10 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useHaptics } from '../hooks/useHaptics';
 import { getHighScore } from '../services/storage';
 import { useSettings } from '../context/SettingsContext';
 import { THEME } from '../constants/theme';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }: any) {
     const { playImpact } = useHaptics();
@@ -20,42 +22,45 @@ export default function HomeScreen({ navigation }: any) {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <View style={styles.headerIndicator}>
-                    <Text style={styles.highScoreLabel}>{t('highScore').toUpperCase()}</Text>
-                    <Text style={styles.highScoreValue}>{highScore}</Text>
+                <View style={styles.scoreBadge}>
+                    <Text style={styles.scoreLabel}>{t('highScore').toUpperCase()}</Text>
+                    <Text style={styles.scoreValue}>{highScore}</Text>
                 </View>
 
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleMain}>WHO'S MORE</Text>
-                    <Text style={styles.titleSecond}>FAMOUS?</Text>
-                    <View style={styles.titleUnderline} />
-                </View>
-                
-                <Text style={styles.subtitle}>{t('by').toUpperCase()} MOUSSANDOU</Text>
-
-                <TouchableOpacity
-                    style={styles.buttonPlay}
-                    activeOpacity={1}
-                    onPress={() => {
-                        playImpact();
-                        navigation.navigate('Game');
-                    }}
-                >
-                    <View style={styles.btnInner}>
-                        <Text style={styles.buttonText}>{t('play').toUpperCase()}</Text>
+                <View style={styles.hero}>
+                    <View style={styles.titleBox}>
+                        <Text style={styles.titleMain}>WHO'S</Text>
+                        <Text style={styles.titleMain}>MORE</Text>
+                        <View style={styles.famousBox}>
+                            <Text style={styles.titleFamous}>FAMOUS?</Text>
+                        </View>
                     </View>
-                </TouchableOpacity>
+                    <Text style={styles.author}>{t('by').toUpperCase()} MOUSSANDOU</Text>
+                </View>
 
-                <TouchableOpacity
-                    style={styles.buttonSecondary}
-                    activeOpacity={1}
-                    onPress={() => {
-                        playImpact();
-                        navigation.navigate('Settings');
-                    }}
-                >
-                    <Text style={styles.buttonTextSecondary}>{t('settings').toUpperCase()}</Text>
-                </TouchableOpacity>
+                <View style={styles.actions}>
+                    <TouchableOpacity
+                        style={styles.btnPrimary}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                            playImpact();
+                            navigation.navigate('Game');
+                        }}
+                    >
+                        <Text style={styles.btnTextPrimary}>{t('play').toUpperCase()}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.btnSecondary}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                            playImpact();
+                            navigation.navigate('Settings');
+                        }}
+                    >
+                        <Text style={styles.btnTextSecondary}>{t('settings').toUpperCase()}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -68,96 +73,108 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24,
+        padding: 28,
+        justifyContent: 'space-between',
+        paddingTop: 80,
+        paddingBottom: 60,
     },
-    headerIndicator: {
-        position: 'absolute',
-        top: 60,
-        alignItems: 'center',
+    scoreBadge: {
+        alignSelf: 'center',
         backgroundColor: THEME.colors.white,
         paddingVertical: 10,
         paddingHorizontal: 24,
-        borderWidth: THEME.borders.width,
+        borderWidth: 3,
         borderColor: THEME.colors.ink,
+        alignItems: 'center',
         ...THEME.shadows.hard,
+        transform: [{ rotate: '-1deg' }],
     },
-    highScoreLabel: {
+    scoreLabel: {
         color: THEME.colors.gray,
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '900',
-        letterSpacing: 2,
+        letterSpacing: 3,
         marginBottom: 2,
     },
-    highScoreValue: {
+    scoreValue: {
         color: THEME.colors.ink,
-        fontSize: 24,
+        fontSize: 36,
         fontWeight: '900',
     },
-    titleContainer: {
+    hero: {
         alignItems: 'center',
-        marginBottom: 8,
+        marginVertical: 40,
     },
-    titleMain: { 
-        fontSize: 48, 
-        fontWeight: '900', 
-        color: THEME.colors.ink, 
-        lineHeight: 48,
+    titleBox: {
+        alignItems: 'center',
     },
-    titleSecond: { 
-        fontSize: 48, 
-        fontWeight: '900', 
+    titleMain: {
         color: THEME.colors.ink,
-        lineHeight: 48,
+        fontSize: 64,
+        fontWeight: '900',
+        lineHeight: 64,
+        textAlign: 'center',
+        letterSpacing: -2,
     },
-    titleUnderline: {
-        height: 6,
+    famousBox: {
         backgroundColor: THEME.colors.accent,
-        width: '100%',
-        marginTop: 4,
+        paddingHorizontal: 24,
+        paddingVertical: 6,
+        marginTop: 12,
+        borderWidth: 4,
+        borderColor: THEME.colors.ink,
+        transform: [{ rotate: '3deg' }],
+        ...THEME.shadows.hard,
     },
-    subtitle: { 
-        fontSize: 12, 
-        color: THEME.colors.gray, 
-        marginBottom: 80,
-        fontWeight: 'bold',
+    titleFamous: {
+        color: THEME.colors.white,
+        fontSize: 56,
+        fontWeight: '900',
+        lineHeight: 56,
+    },
+    author: {
+        color: THEME.colors.gray,
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 6,
+        marginTop: 40,
+        opacity: 0.8,
+    },
+    actions: {
+        width: '100%',
+    },
+    btnPrimary: {
+        backgroundColor: THEME.colors.accent,
+        height: 75,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 4,
+        borderColor: THEME.colors.ink,
+        marginBottom: 20,
+        ...THEME.shadows.hard,
+    },
+    btnTextPrimary: {
+        color: THEME.colors.white,
+        fontSize: 32,
+        fontWeight: '900',
         letterSpacing: 4,
     },
-    buttonPlay: { 
-        width: '100%', 
-        height: 64,
-        marginBottom: 20, 
-        backgroundColor: THEME.colors.ink,
-        borderWidth: THEME.borders.width,
-        borderColor: THEME.colors.ink,
-        ...THEME.shadows.hard,
-    },
-    btnInner: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonSecondary: { 
-        paddingVertical: 14, 
-        width: '100%', 
-        alignItems: 'center',
-        borderWidth: THEME.borders.width,
-        borderColor: THEME.colors.ink,
+    btnSecondary: {
         backgroundColor: THEME.colors.white,
+        height: 65,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 4,
+        borderColor: THEME.colors.ink,
         ...THEME.shadows.hard,
     },
-    buttonText: { 
-        color: THEME.colors.paper, 
-        fontSize: 22, 
-        fontWeight: '900', 
-        letterSpacing: 2 
-    },
-    buttonTextSecondary: { 
-        color: THEME.colors.ink, 
-        fontSize: 16, 
+    btnTextSecondary: {
+        color: THEME.colors.ink,
+        fontSize: 20,
         fontWeight: '900',
-        letterSpacing: 1
+        letterSpacing: 2,
     },
 });
+
+
 
