@@ -166,9 +166,10 @@ export default function GameScreen({ navigation }: any) {
             {/* En-tête : score + vies */}
             <View style={styles.header}>
                 <View>
-                    <Text style={styles.scoreTitle}>SCORE</Text>
+                    <Text style={styles.scoreTitle}>{t('score')}</Text>
                     <Text style={styles.scoreText}>{score}</Text>
                 </View>
+
 
                 <View style={styles.livesContainer}>
                     {[...Array(3)].map((_, i) => (
@@ -179,8 +180,9 @@ export default function GameScreen({ navigation }: any) {
                 </View>
 
                 <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={styles.scoreTitle}>STREAK</Text>
+                    <Text style={styles.scoreTitle}>{t('streak')}</Text>
                     <Text style={[styles.streakText, streak === 0 && { opacity: 0.3 }]}>
+
                         🔥 {streak}
                     </Text>
                 </View>

@@ -31,7 +31,8 @@ export default function HomeScreen({ navigation }: any) {
                 </View>
 
                 <Text style={styles.title}>🎌 Who's More Famous?</Text>
-                <Text style={styles.subtitle}>Anime Edition par Moussandou</Text>
+                <Text style={styles.subtitle}>Anime Edition {t('by')} Moussandou</Text>
+
                 
                 <TouchableOpacity
                     style={styles.buttonPlay}

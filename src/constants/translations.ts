@@ -20,10 +20,13 @@ export const translations = {
         than: 'que',
         fans: 'fans',
         error: 'Une erreur est survenue...',
-        footer: 'Créé avec ❤️ pour les fans d\'Anime'
+        footer: 'Créé avec ❤️ pour les fans d\'Anime',
+        score: 'SCORE',
+        streak: 'SÉRIE',
+        by: 'par'
     },
     en: {
-        highScore: 'HIGHEST SCORE',
+        highScore: 'HIGH SCORE',
         play: '▶ PLAY',
         settings: '⚙ Settings',
         back: 'Back',
@@ -42,8 +45,11 @@ export const translations = {
         moreFans: 'Who has more fans?',
         than: 'than',
         fans: 'fans',
-        error: 'An error occurred...',
-        footer: 'Made with ❤️ for Anime fans'
+        error: 'Something went wrong...',
+        footer: 'Made with ❤️ for Anime fans',
+        score: 'SCORE',
+        streak: 'STREAK',
+        by: 'by'
     }
 };
 

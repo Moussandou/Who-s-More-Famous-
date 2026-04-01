@@ -1,4 +1,5 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { useSettings } from '../context/SettingsContext';
 
 export interface Anime {
     id: number;
@@ -17,7 +18,10 @@ interface AnimeCardProps {
 }
 
 export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeCardProps) {
+    const { t } = useSettings();
     if (!anime) return null;
+
+
 
     // Calcul du style de bordure en fonction du feedback
     const borderStyle = feedback === 'correct' 
@@ -42,7 +46,7 @@ export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeC
                         <Text style={styles.memberCount}>
                             {anime.members.toLocaleString()}
                         </Text>
-                        <Text style={styles.memberLabel}>fans</Text>
+                        <Text style={styles.memberLabel}>{t('fans')}</Text>
                     </View>
                 )}
             </View>
