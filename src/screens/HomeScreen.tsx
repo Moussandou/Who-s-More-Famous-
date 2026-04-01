@@ -2,9 +2,11 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useHaptics } from '../hooks/useHaptics';
 import { getHighScore } from '../services/storage';
 
 export default function HomeScreen({ navigation }: any) {
+    const { playImpact } = useHaptics();
     const [highScore, setHighScore] = useState(0);
 
     // Se déclenche à chaque fois que l'écran devient actif
@@ -32,7 +34,10 @@ export default function HomeScreen({ navigation }: any) {
                 <TouchableOpacity
                     style={styles.buttonPlay}
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('Game')}
+                    onPress={() => {
+                        playImpact();
+                        navigation.navigate('Game');
+                    }}
                 >
                     <LinearGradient
                         colors={['#7c3aed', '#6366f1']}
@@ -47,8 +52,12 @@ export default function HomeScreen({ navigation }: any) {
                 <TouchableOpacity
                     style={styles.buttonSecondary}
                     activeOpacity={0.7}
-                    onPress={() => navigation.navigate('Settings')}
+                    onPress={() => {
+                        playImpact();
+                        navigation.navigate('Settings');
+                    }}
                 >
+
                     <Text style={styles.buttonTextSecondary}>⚙ Paramètres</Text>
                 </TouchableOpacity>
             </View>

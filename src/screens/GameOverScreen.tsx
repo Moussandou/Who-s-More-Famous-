@@ -1,16 +1,59 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useHaptics } from '../hooks/useHaptics';
 
-export default function GameOverScreen({ navigation }: any) {
+export default function GameOverScreen({ navigation, route }: any) {
+    const { score } = route.params || { score: 0 };
+    const { playError, playImpact } = useHaptics();
+
+    useEffect(() => {
+        // ✨ Vibration d'erreur à l'ouverture pour marquer le Game Over
+        playError();
+    }, []);
+
     return (
         <View style={styles.container}>
+            <LinearGradient
+                colors={['#1a1a2e', '#0f0f1a']}
+                style={StyleSheet.absoluteFillObject}
+            />
+
+            <Text style={styles.emoji}>💀</Text>
             <Text style={styles.title}>Game Over !</Text>
-            <Text style={styles.subtitle}>Score Final: 0 (Simulé)</Text>
+            
+            <View style={styles.scoreContainer}>
+                <Text style={styles.scoreLabel}>VOTRE SCORE</Text>
+                <Text style={styles.scoreValue}>{score}</Text>
+            </View>
 
             <TouchableOpacity 
                 style={styles.buttonPlay}
-                onPress={() => navigation.navigate('Home')}
+                activeOpacity={0.8}
+                onPress={() => {
+                    playImpact();
+                    navigation.navigate('Home');
+                }}
             >
-                <Text style={styles.buttonText}>🏠 Menu Principal</Text>
+                <LinearGradient
+                    colors={['#7c3aed', '#6366f1']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.gradient}
+                >
+                    <Text style={styles.buttonText}>🏠 Menu Principal</Text>
+                </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={styles.buttonRetry}
+                activeOpacity={0.7}
+                onPress={() => {
+                    playImpact();
+                    navigation.replace('Game');
+                }}
+            >
+                <Text style={styles.retryText}>Rejouer</Text>
             </TouchableOpacity>
         </View>
     );
@@ -22,10 +65,64 @@ const styles = StyleSheet.create({
         backgroundColor: '#0f0f1a',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
+        padding: 40,
     },
-    title: { color: '#ff4b4b', fontSize: 32, fontWeight: 'bold', marginBottom: 20 },
-    subtitle: { color: '#8888aa', fontSize: 16, marginBottom: 60 },
-    buttonPlay: { backgroundColor: '#7c3aed', paddingVertical: 16, paddingHorizontal: 48, borderRadius: 14, marginBottom: 16, width: '100%', alignItems: 'center' },
-    buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+    emoji: {
+        fontSize: 64,
+        marginBottom: 10,
+    },
+    title: { 
+        color: '#ff4b4b', 
+        fontSize: 40, 
+        fontWeight: '900', 
+        marginBottom: 40,
+        letterSpacing: 2,
+    },
+    scoreContainer: {
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        paddingVertical: 20,
+        paddingHorizontal: 40,
+        borderRadius: 20,
+        marginBottom: 60,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    scoreLabel: {
+        color: '#8888aa',
+        fontSize: 12,
+        fontWeight: 'bold',
+        letterSpacing: 2,
+        marginBottom: 5,
+    },
+    scoreValue: {
+        color: '#fff',
+        fontSize: 64,
+        fontWeight: '900',
+    },
+    buttonPlay: {
+        width: '100%',
+        height: 56,
+        borderRadius: 16,
+        overflow: 'hidden',
+        marginBottom: 16,
+    },
+    gradient: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: { 
+        color: '#fff', 
+        fontSize: 18, 
+        fontWeight: 'bold' 
+    },
+    buttonRetry: {
+        padding: 10,
+    },
+    retryText: {
+        color: '#8888aa',
+        fontSize: 16,
+        fontWeight: '600',
+    }
 });

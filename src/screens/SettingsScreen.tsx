@@ -1,14 +1,20 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useHaptics } from '../hooks/useHaptics';
 
 export default function SettingsScreen({ navigation }: any) {
+    const { playImpact } = useHaptics();
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>⚙ Paramètres</Text>
             <Text style={styles.subtitle}>Configurions l'expérience...</Text>
 
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={styles.buttonSecondary}
-                onPress={() => navigation.goBack()}
+                onPress={() => {
+                    playImpact();
+                    navigation.goBack();
+                }}
             >
                 <Text style={styles.buttonTextSecondary}>⬅ Retour</Text>
             </TouchableOpacity>

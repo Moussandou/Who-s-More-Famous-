@@ -7,8 +7,10 @@ import { fetchDuel, initializePool } from '../services/jikanAPI';
 import { saveHighScore } from '../services/storage';
 import AnimeCard, { Anime } from '../components/AnimeCard';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useHaptics } from '../hooks/useHaptics';
 
 export default function GameScreen({ navigation }: any) {
+    const { playSuccess, playError } = useHaptics();
 
     // ─── STATE ───────────────────────────────────────────────────────
     // useState(valeurInitiale) retourne [valeur, fonctionPourLaModifier]
@@ -76,13 +78,13 @@ export default function GameScreen({ navigation }: any) {
         if (isCorrect) {
             setScore(s => s + 1);
             setStreak(s => s + 1);
-            // On met en vert celui qui a été choisi
-            if (chosen === anime1) setFeedback1('correct');
-            else setFeedback2('correct');
+            setFeedback1(chosen === anime1 ? 'correct' : feedback1);
+            setFeedback2(chosen === anime2 ? 'correct' : feedback2);
+            // ✨ Vibration de succès (via hook)
+            playSuccess();
         } else {
             setStreak(0);
             setLives(l => l - 1);
-            // Celui choisi est rouge, l'autre est vert (le bon choix)
             if (chosen === anime1) {
                 setFeedback1('wrong');
                 setFeedback2('correct');
@@ -90,6 +92,8 @@ export default function GameScreen({ navigation }: any) {
                 setFeedback2('wrong');
                 setFeedback1('correct');
             }
+            // ✨ Vibration d'erreur (via hook)
+            playError();
         }
 
         // Après 1.5s (plus long pour laisser lire les chiffres)
