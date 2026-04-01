@@ -240,14 +240,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     duel: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 8,
+        paddingBottom: 40,
     },
+
     vsBadge: {
         position: 'absolute',
-        top: '40%',
+        top: '45%',
+
         left: '50%',
         marginLeft: -28,
         width: 56,

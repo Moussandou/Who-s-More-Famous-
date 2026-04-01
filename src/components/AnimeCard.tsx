@@ -100,11 +100,11 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         flex: 1,
-        height: 200,
-        backgroundColor: '#E5E7EB', // Lighter placeholder for fallback
+        backgroundColor: '#E5E7EB',
         borderBottomWidth: THEME.borders.width,
         borderColor: THEME.colors.ink,
     },
+
     image: {
         width: '100%',
         height: '100%',
@@ -116,18 +116,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     infoContainer: {
-        padding: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 8,
         backgroundColor: THEME.colors.white,
-        height: 80,
+        minHeight: 90,
         justifyContent: 'center',
     },
     title: {
         color: THEME.colors.ink,
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '900',
-        lineHeight: 18,
+        lineHeight: 20,
         textAlign: 'center',
+        letterSpacing: 0.5,
     },
+
     badge: {
         backgroundColor: THEME.colors.accent,
         paddingHorizontal: 16,
