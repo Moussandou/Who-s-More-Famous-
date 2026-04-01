@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet, Switch, ScrollView } from 'react-native';
 import { useHaptics } from '../hooks/useHaptics';
 import { useSettings } from '../context/SettingsContext';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { THEME } from '../constants/theme';
 
 export default function SettingsScreen({ navigation }: any) {
     const { playImpact } = useHaptics();
@@ -15,102 +15,102 @@ export default function SettingsScreen({ navigation }: any) {
 
     return (
         <View style={styles.container}>
-            <LinearGradient
-                colors={['#1a1a2e', '#0f0f1a']}
-                style={StyleSheet.absoluteFillObject}
-            />
-
             <View style={styles.header}>
                 <TouchableOpacity
                     style={styles.backButton}
                     onPress={() => { playImpact(); navigation.goBack(); }}
                 >
-                    <Ionicons name="chevron-back" size={28} color="#fff" />
+                    <Ionicons name="chevron-back" size={28} color={THEME.colors.ink} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>{t('settings').replace(/⚙ /, '')}</Text>
+                <View style={styles.titleWrapper}>
+                    <Text style={styles.headerTitle}>{t('settings').replace(/⚙ /, '').toUpperCase()}</Text>
+                    <View style={styles.titleUnderline} />
+                </View>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>{t('gameplay')}</Text>
+                    <Text style={styles.sectionTitle}>{t('gameplay').toUpperCase()}</Text>
                     
                     <View style={styles.settingItem}>
                         <View style={styles.settingTextContainer}>
-                            <Ionicons name="pulse" size={22} color="#7c3aed" />
-                            <Text style={styles.settingLabel}>{t('vibrations')}</Text>
+                            <Ionicons name="pulse" size={20} color={THEME.colors.ink} />
+                            <Text style={styles.settingLabel}>{t('vibrations').toUpperCase()}</Text>
                         </View>
                         <Switch
                             value={settings.vibrations}
                             onValueChange={toggleHaptics}
-                            trackColor={{ false: '#333', true: '#7c3aed' }}
-                            thumbColor="#fff"
+                            trackColor={{ false: THEME.colors.gray, true: THEME.colors.ink }}
+                            thumbColor={THEME.colors.white}
                         />
                     </View>
 
+                    <View style={styles.settingItemDivider} />
+
                     <View style={styles.settingItem}>
                         <View style={styles.settingTextContainer}>
-                            <Ionicons name="speedometer" size={22} color="#7c3aed" />
-                            <Text style={styles.settingLabel}>{t('difficulty')}</Text>
+                            <Ionicons name="speedometer" size={20} color={THEME.colors.ink} />
+                            <Text style={styles.settingLabel}>{t('difficulty').toUpperCase()}</Text>
                         </View>
-                        <View style={styles.difficultyContainer}>
+                        <View style={styles.segmentedContainer}>
                             <TouchableOpacity
-                                style={[styles.diffBtn, settings.difficulty === 'classic' && styles.diffBtnActive]}
+                                style={[styles.segBtn, settings.difficulty === 'classic' && styles.segBtnActive]}
                                 onPress={() => { playImpact(); updateSetting('difficulty', 'classic'); }}
                             >
-                                <Text style={[styles.diffText, settings.difficulty === 'classic' && styles.diffTextActive]}>{t('classic')}</Text>
+                                <Text style={[styles.segText, settings.difficulty === 'classic' && styles.segTextActive]}>
+                                    {t('classic').toUpperCase()}
+                                </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.diffBtn, settings.difficulty === 'expert' && styles.diffBtnActive]}
+                                style={[styles.segBtn, settings.difficulty === 'expert' && styles.segBtnActive]}
                                 onPress={() => { playImpact(); updateSetting('difficulty', 'expert'); }}
                             >
-                                <Text style={[styles.diffText, settings.difficulty === 'expert' && styles.diffTextActive]}>{t('expert')}</Text>
+                                <Text style={[styles.segText, settings.difficulty === 'expert' && styles.segTextActive]}>
+                                    {t('expert').toUpperCase()}
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>{t('application')}</Text>
+                    <Text style={styles.sectionTitle}>{t('application').toUpperCase()}</Text>
                     
                     <View style={styles.settingItem}>
                         <View style={styles.settingTextContainer}>
-                            <Ionicons name="language" size={22} color="#7c3aed" />
-                            <Text style={styles.settingLabel}>{t('language')}</Text>
+                            <Ionicons name="language" size={20} color={THEME.colors.ink} />
+                            <Text style={styles.settingLabel}>{t('language').toUpperCase()}</Text>
                         </View>
-                        <View style={styles.difficultyContainer}>
+                        <View style={styles.segmentedContainer}>
                             <TouchableOpacity
-                                style={[styles.diffBtn, settings.language === 'fr' && styles.diffBtnActive]}
+                                style={[styles.segBtn, settings.language === 'fr' && styles.segBtnActive]}
                                 onPress={() => { playImpact(); updateSetting('language', 'fr'); }}
                             >
-                                <Text style={[styles.diffText, settings.language === 'fr' && styles.diffTextActive]}>FR</Text>
+                                <Text style={[styles.segText, settings.language === 'fr' && styles.segTextActive]}>FR</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.diffBtn, settings.language === 'en' && styles.diffBtnActive]}
+                                style={[styles.segBtn, settings.language === 'en' && styles.segBtnActive]}
                                 onPress={() => { playImpact(); updateSetting('language', 'en'); }}
                             >
-                                <Text style={[styles.diffText, settings.language === 'en' && styles.diffTextActive]}>EN</Text>
+                                <Text style={[styles.segText, settings.language === 'en' && styles.segTextActive]}>EN</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
 
-                <TouchableOpacity 
-                    style={styles.footerInfo}
-                    onPress={() => playImpact()}
-                >
-                    <Text style={styles.versionText}>Who's More Famous v1.0.2</Text>
-                    <Text style={styles.creditText}>{t('footer')}</Text>
-                </TouchableOpacity>
+                <View style={styles.footerInfo}>
+                    <Text style={styles.versionText}>WHO'S MORE FAMOUS V1.1.0</Text>
+                    <Text style={styles.creditText}>{t('footer').toUpperCase()} BY MOUSSANDOU</Text>
+                </View>
             </ScrollView>
         </View>
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0f0f1a',
+        backgroundColor: THEME.colors.paper,
     },
     header: {
         flexDirection: 'row',
@@ -120,76 +120,91 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        width: 44,
+        height: 44,
+        borderWidth: 2,
+        borderColor: THEME.colors.ink,
+        backgroundColor: THEME.colors.white,
         justifyContent: 'center',
         alignItems: 'center',
+        ...THEME.shadows.hard,
+    },
+    titleWrapper: {
+        marginLeft: 20,
+        alignItems: 'flex-start',
     },
     headerTitle: {
-        color: '#fff',
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginLeft: 15,
+        color: THEME.colors.ink,
+        fontSize: 28,
+        fontWeight: '900',
+    },
+    titleUnderline: {
+        height: 6,
+        width: '100%',
+        backgroundColor: THEME.colors.accent,
+        marginTop: -4,
+        zIndex: -1,
     },
     scrollContent: {
         padding: 20,
     },
     section: {
         marginBottom: 30,
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        borderRadius: 20,
-        padding: 15,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: THEME.colors.white,
+        padding: 20,
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
     },
     sectionTitle: {
-        color: '#8888aa',
-        fontSize: 12,
-        fontWeight: 'bold',
-        letterSpacing: 1.5,
-        marginBottom: 15,
-        marginLeft: 5,
+        color: THEME.colors.gray,
+        fontSize: 10,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginBottom: 20,
     },
     settingItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 5,
+        paddingVertical: 10,
+    },
+    settingItemDivider: {
+        height: 1,
+        backgroundColor: THEME.colors.paper,
+        marginVertical: 10,
     },
     settingTextContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     settingLabel: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
+        color: THEME.colors.ink,
+        fontSize: 14,
+        fontWeight: '900',
         marginLeft: 12,
     },
-    difficultyContainer: {
+    segmentedContainer: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(0,0,0,0.2)',
-        borderRadius: 10,
-        padding: 4,
+        backgroundColor: THEME.colors.ink,
+        padding: 3,
+        borderWidth: 1,
+        borderColor: THEME.colors.ink,
     },
-    diffBtn: {
+    segBtn: {
         paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 7,
+        paddingHorizontal: 16,
     },
-    diffBtnActive: {
-        backgroundColor: '#7c3aed',
+    segBtnActive: {
+        backgroundColor: THEME.colors.white,
     },
-    diffText: {
-        color: '#8888aa',
-        fontSize: 13,
-        fontWeight: 'bold',
+    segText: {
+        color: THEME.colors.paper,
+        fontSize: 11,
+        fontWeight: '900',
     },
-    diffTextActive: {
-        color: '#fff',
+    segTextActive: {
+        color: THEME.colors.ink,
     },
     footerInfo: {
         alignItems: 'center',
@@ -197,13 +212,17 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     versionText: {
-        color: '#444466',
-        fontSize: 12,
-        fontWeight: 'bold',
+        color: THEME.colors.gray,
+        fontSize: 10,
+        fontWeight: '900',
+        letterSpacing: 1,
     },
     creditText: {
-        color: '#444466',
-        fontSize: 11,
+        color: THEME.colors.gray,
+        fontSize: 9,
         marginTop: 4,
+        fontWeight: '700',
+        letterSpacing: 0.5,
     }
 });
+

@@ -1,5 +1,6 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSettings } from '../context/SettingsContext';
+import { THEME } from '../constants/theme';
 
 export interface Anime {
     id: number;
@@ -14,49 +15,56 @@ interface AnimeCardProps {
     anime: Anime | null;
     onPress: () => void;
     feedback?: 'correct' | 'wrong' | null;
-    revealed?: boolean; // ✨ Nouveau : pour afficher le nombre de membres
+    revealed?: boolean;
 }
 
 export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeCardProps) {
     const { t } = useSettings();
     if (!anime) return null;
 
-
-
-    // Calcul du style de bordure en fonction du feedback
-    const borderStyle = feedback === 'correct' 
-        ? styles.correctBorder 
-        : feedback === 'wrong' 
-        ? styles.wrongBorder 
-        : null;
-
     return (
         <TouchableOpacity 
-            style={[styles.card, borderStyle]} 
+            style={[
+                styles.card, 
+                feedback === 'correct' && styles.correctBorder,
+                feedback === 'wrong' && styles.wrongBorder
+            ]} 
             onPress={onPress}
-            activeOpacity={0.9}
+            activeOpacity={1} // No fade on click for a "snappy" manga feel
         >
-            <Image source={{ uri: anime.image }} style={styles.image} />
+            <View style={styles.imageContainer}>
+                <Image source={{ uri: anime.image }} style={styles.image} resizeMode="cover" />
+            </View>
             
             <View style={styles.infoContainer}>
-                <Text style={styles.title} numberOfLines={2}>{anime.title}</Text>
+                <Text style={styles.title} numberOfLines={2}>
+                    {anime.title.toUpperCase()}
+                </Text>
                 
                 {revealed && (
                     <View style={styles.revealContainer}>
-                        <Text style={styles.memberCount}>
-                            {anime.members.toLocaleString()}
-                        </Text>
-                        <Text style={styles.memberLabel}>{t('fans')}</Text>
+                        <View style={styles.badge}>
+                            <Text style={styles.memberCount}>
+                                {anime.members.toLocaleString()}
+                            </Text>
+                            <Text style={styles.memberLabel}>
+                                {t('fans').toUpperCase()}
+                            </Text>
+                        </View>
                     </View>
                 )}
             </View>
 
-            {/* Overlay translucide pour le feedback visuel */}
-            {feedback && (
-                <View style={[
-                    styles.overlay, 
-                    feedback === 'correct' ? styles.correctOverlay : styles.wrongOverlay
-                ]} />
+            {/* Solid marks for feedback instead of generic overlay */}
+            {feedback === 'correct' && (
+                <View style={[styles.markContainer, styles.correctMark]}>
+                    <Text style={styles.markText}>WIN</Text>
+                </View>
+            )}
+            {feedback === 'wrong' && (
+                <View style={[styles.markContainer, styles.wrongMark]}>
+                    <Text style={styles.markText}>LOSE</Text>
+                </View>
             )}
         </TouchableOpacity>
     );
@@ -66,75 +74,87 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
         height: 280,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)', // Glassmorphism
-        borderRadius: 20,
-        marginHorizontal: 5,
+        backgroundColor: THEME.colors.white,
+        borderRadius: THEME.borders.radius,
+        marginHorizontal: 8,
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        // Shadow for premium look
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 15,
-        elevation: 5,
     },
     correctBorder: {
         borderColor: '#10b981',
-        borderWidth: 2,
+        borderWidth: THEME.borders.width + 1,
     },
     wrongBorder: {
-        borderColor: '#ef4444',
-        borderWidth: 2,
+        borderColor: THEME.colors.accent,
+        borderWidth: THEME.borders.width + 1,
+    },
+    imageContainer: {
+        flex: 1,
+        backgroundColor: '#ddd',
+        borderBottomWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
     },
     image: {
         width: '100%',
         height: '100%',
-        position: 'absolute',
     },
     infoContainer: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        padding: 12,
-        backgroundColor: 'rgba(0,0,0,0.4)', // Gradient simulé
+        padding: 10,
+        backgroundColor: THEME.colors.white,
+        height: 90,
+        justifyContent: 'center',
     },
     title: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: -1, height: 1 },
-        textShadowRadius: 10,
+        color: THEME.colors.ink,
+        fontSize: 14,
+        fontWeight: '900',
+        lineHeight: 18,
     },
     revealContainer: {
-        marginTop: 8,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        borderRadius: 8,
+        marginTop: 6,
         alignSelf: 'flex-start',
-        alignItems: 'center',
+    },
+    badge: {
+        backgroundColor: THEME.colors.ink,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
         flexDirection: 'row',
+        alignItems: 'center',
     },
     memberCount: {
-        color: '#fcd34d',
+        color: THEME.colors.paper,
         fontWeight: '900',
-        fontSize: 14,
+        fontSize: 12,
     },
     memberLabel: {
-        color: '#fff',
-        fontSize: 10,
+        color: THEME.colors.paper,
+        fontSize: 9,
         marginLeft: 4,
-        opacity: 0.8,
+        fontWeight: 'bold',
     },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        opacity: 0.3,
+    markContainer: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderWidth: 2,
+        borderColor: THEME.colors.ink,
+        backgroundColor: THEME.colors.white,
+        transform: [{ rotate: '15deg' }],
+        zIndex: 10,
     },
-    correctOverlay: {
+    correctMark: {
         backgroundColor: '#10b981',
     },
-    wrongOverlay: {
-        backgroundColor: '#ef4444',
+    wrongMark: {
+        backgroundColor: THEME.colors.accent,
     },
+    markText: {
+        color: THEME.colors.ink,
+        fontWeight: '900',
+        fontSize: 16,
+    }
 });

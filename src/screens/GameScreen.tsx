@@ -6,44 +6,30 @@ import { useState, useEffect, useRef } from 'react';
 import { fetchDuel, initializePool } from '../services/jikanAPI';
 import { saveHighScore } from '../services/storage';
 import AnimeCard, { Anime } from '../components/AnimeCard';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useHaptics } from '../hooks/useHaptics';
 import { useSettings } from '../context/SettingsContext';
+import { THEME } from '../constants/theme';
 
 export default function GameScreen({ navigation }: any) {
-    const { playSuccess, playError } = useHaptics();
+    const { playSuccess, playError, playImpact } = useHaptics();
     const { settings, t } = useSettings();
 
-    // ─── STATE ───────────────────────────────────────────────────────
-    // useState(valeurInitiale) retourne [valeur, fonctionPourLaModifier]
-    // Quand tu appelles setXxx(), React re-render le composant avec la nouvelle valeur.
-
-    const [anime1, setAnime1] = useState<Anime | null>(null);   // 1er animé du duel
-    const [anime2, setAnime2] = useState<Anime | null>(null);   // 2ème animé du duel
-    const [score, setScore] = useState(0);      // score actuel
-    const [streak, setStreak] = useState(0);      // série de bonnes réponses
-    const [lives, setLives] = useState(3);        // ✨ Système de vies (3 chances)
-    const [revealed, setRevealed] = useState(false); // ✨ Révéler le nombre de fans
-    const [loading, setLoading] = useState(true);   // est-ce qu'on charge ?
+    const [anime1, setAnime1] = useState<Anime | null>(null);
+    const [anime2, setAnime2] = useState<Anime | null>(null);
+    const [score, setScore] = useState(0);
+    const [streak, setStreak] = useState(0);
+    const [lives, setLives] = useState(3);
+    const [revealed, setRevealed] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [feedback1, setFeedback1] = useState<'correct' | 'wrong' | null>(null);
     const [feedback2, setFeedback2] = useState<'correct' | 'wrong' | null>(null);
-    const [error, setError] = useState<string | null>(null);   // message d'erreur API
+    const [error, setError] = useState<string | null>(null);
 
-    // useRef = une valeur qui persiste entre les renders SANS déclencher un re-render.
-    // Ici on l'utilise pour l'animation (pas besoin de re-render pour animer).
     const fadeAnim = useRef(new Animated.Value(1)).current;
-
-    // ─── EFFETS ──────────────────────────────────────────────────────
-    // useEffect(fonction, [dépendances])
-    // La fonction s'exécute APRÈS le premier render, et à chaque fois 
-    // qu'une dépendance change.
-    // [] vide = s'exécute UNE SEULE FOIS au montage du composant.
 
     useEffect(() => {
         loadDuel();
-    }, []); // ← [] : charge un duel au démarrage
-
-    // ─── FONCTIONS ───────────────────────────────────────────────────
+    }, []);
 
     async function loadDuel() {
         try {
@@ -51,18 +37,16 @@ export default function GameScreen({ navigation }: any) {
             setError(null);
             setFeedback1(null);
             setFeedback2(null);
-            setRevealed(false); // On cache les résultats pour le nouveau duel
+            setRevealed(false);
 
-            // 1. On s'assure que le pool est prêt (une seule fois par session)
             await initializePool(settings.difficulty);
 
-            // 2. On pioche le duel
             const { anime1, anime2 } = await fetchDuel();
             setAnime1(anime1);
             setAnime2(anime2);
 
         } catch (err: any) {
-            setError(err.message || "Impossible de charger les données. Réessaie !");
+            setError(err.message || "ERROR");
         } finally {
             setLoading(false);
         }
@@ -70,19 +54,17 @@ export default function GameScreen({ navigation }: any) {
 
     function handleChoice(chosen: Anime | null) {
         if (!chosen) return;
-        // "chosen" = l'animé sur lequel l'utilisateur a tapé
         const other = chosen === anime1 ? anime2 : anime1;
-        if (!other) return; // Sécurité TypeScript
+        if (!other) return;
 
         const isCorrect = chosen.members >= other.members;
-        setRevealed(true); // On révèle les chiffres !
+        setRevealed(true);
 
         if (isCorrect) {
             setScore(s => s + 1);
             setStreak(s => s + 1);
-            setFeedback1(chosen === anime1 ? 'correct' : feedback1);
-            setFeedback2(chosen === anime2 ? 'correct' : feedback2);
-            // ✨ Vibration de succès (via hook)
+            setFeedback1(chosen === anime1 ? 'correct' : null);
+            setFeedback2(chosen === anime2 ? 'correct' : null);
             playSuccess();
         } else {
             setStreak(0);
@@ -94,16 +76,13 @@ export default function GameScreen({ navigation }: any) {
                 setFeedback2('wrong');
                 setFeedback1('correct');
             }
-            // ✨ Vibration d'erreur (via hook)
             playError();
         }
 
-        // Après 1.5s (plus long pour laisser lire les chiffres)
         setTimeout(async () => {
             const currentLives = isCorrect ? lives : lives - 1;
 
             if (currentLives <= 0) {
-                // Game over : Sauvegarder le High Score avant de partir
                 await saveHighScore(score);
                 navigation.replace('GameOver', { score });
                 return;
@@ -113,33 +92,27 @@ export default function GameScreen({ navigation }: any) {
     }
 
     function animateTransition() {
-        // Animated.sequence = joue les animations l'une après l'autre
         Animated.sequence([
-            // Fade out (opacité 1 → 0 en 300ms)
             Animated.timing(fadeAnim, {
                 toValue: 0,
-                duration: 300,
-                useNativeDriver: true, // ← TOUJOURS true pour les perfs (GPU natif)
+                duration: 200,
+                useNativeDriver: true,
             }),
-            // Fade in (opacité 0 → 1 en 300ms)
             Animated.timing(fadeAnim, {
                 toValue: 1,
-                duration: 300,
+                duration: 200,
                 useNativeDriver: true,
             }),
         ]).start(() => {
-            // Le callback start() s'exécute quand l'animation est finie
             loadDuel();
         });
     }
-    // ─── RENDU ───────────────────────────────────────────────────────
 
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator size="large" color="#7c3aed" />
-                <Text style={styles.loadingText}>{t('loading')}</Text>
-
+                <ActivityIndicator size="large" color={THEME.colors.ink} />
+                <Text style={styles.loadingText}>{t('loading').toUpperCase()}</Text>
             </View>
         );
     }
@@ -147,44 +120,46 @@ export default function GameScreen({ navigation }: any) {
     if (error) {
         return (
             <View style={styles.center}>
-                <Text style={styles.errorText}>{t('error')}</Text>
-                <Text style={styles.errorDetail}>{error}</Text>
-                <TouchableOpacity style={styles.retryBtn} onPress={loadDuel}>
-                    <Text style={styles.buttonText}>🔄 {t('retry')}</Text>
-                </TouchableOpacity>
+                <View style={styles.errorBox}>
+                    <Text style={styles.errorText}>{t('error').toUpperCase()}</Text>
+                    <Text style={styles.errorDetail}>{error}</Text>
+                    <TouchableOpacity 
+                        style={styles.retryBtn} 
+                        onPress={() => { playImpact(); loadDuel(); }}
+                    >
+                        <Text style={styles.retryBtnText}>{t('retry').toUpperCase()}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            <LinearGradient
-                colors={['#1a1a2e', '#0f0f1a']}
-                style={StyleSheet.absoluteFillObject}
-            />
-
-            {/* En-tête : score + vies */}
             <View style={styles.header}>
-                <View>
-                    <Text style={styles.scoreTitle}>{t('score')}</Text>
-                    <Text style={styles.scoreText}>{score}</Text>
+                <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>{t('score').toUpperCase()}</Text>
+                    <Text style={styles.statValue}>{score}</Text>
                 </View>
 
-
-                <View style={styles.livesContainer}>
-                    {[...Array(3)].map((_, i) => (
-                        <Text key={i} style={[styles.heart, i >= lives && styles.heartEmpty]}>
-                            ❤️
-                        </Text>
-                    ))}
+                <View style={styles.centerHeader}>
+                    <Text style={styles.livesLabel}>LIVES</Text>
+                    <View style={styles.livesContainer}>
+                        {[...Array(3)].map((_, i) => (
+                            <View 
+                                key={i} 
+                                style={[
+                                    styles.lifeBlock, 
+                                    i >= lives && styles.lifeBlockEmpty
+                                ]} 
+                            />
+                        ))}
+                    </View>
                 </View>
 
-                <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={styles.scoreTitle}>{t('streak')}</Text>
-                    <Text style={[styles.streakText, streak === 0 && { opacity: 0.3 }]}>
-
-                        🔥 {streak}
-                    </Text>
+                <View style={[styles.statBox, { alignItems: 'flex-end' }]}>
+                    <Text style={styles.statLabel}>{t('streak').toUpperCase()}</Text>
+                    <Text style={[styles.statValue, { color: THEME.colors.accent }]}>{streak}</Text>
                 </View>
             </View>
 
@@ -196,7 +171,9 @@ export default function GameScreen({ navigation }: any) {
                     onPress={() => !revealed && handleChoice(anime1)}
                 />
 
-                <Text style={styles.vs}>VS</Text>
+                <View style={styles.vsContainer}>
+                    <Text style={styles.vsText}>VS</Text>
+                </View>
 
                 <AnimeCard
                     anime={anime2}
@@ -212,91 +189,121 @@ export default function GameScreen({ navigation }: any) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0f0f1a',
+        backgroundColor: THEME.colors.paper,
         paddingTop: 60,
     },
     center: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#0f0f1a',
+        backgroundColor: THEME.colors.paper,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        marginBottom: 40,
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        marginBottom: 30,
     },
-    scoreTitle: {
-        color: '#8888aa',
+    statBox: {
+        flex: 1,
+    },
+    statLabel: {
+        color: THEME.colors.gray,
         fontSize: 10,
-        fontWeight: 'bold',
+        fontWeight: '900',
         letterSpacing: 1,
     },
-    scoreText: {
-        color: '#fff',
-        fontSize: 24,
+    statValue: {
+        color: THEME.colors.ink,
+        fontSize: 22,
         fontWeight: '900',
+    },
+    centerHeader: {
+        alignItems: 'center',
+        marginHorizontal: 10,
+    },
+    livesLabel: {
+        fontSize: 9,
+        fontWeight: '900',
+        color: THEME.colors.gray,
+        letterSpacing: 2,
+        marginBottom: 4,
     },
     livesContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        paddingVertical: 5,
-        paddingHorizontal: 12,
-        borderRadius: 20,
     },
-    heart: {
-        fontSize: 18,
+    lifeBlock: {
+        width: 16,
+        height: 16,
+        backgroundColor: THEME.colors.ink,
         marginHorizontal: 2,
+        borderWidth: 1,
+        borderColor: THEME.colors.ink,
     },
-    heartEmpty: {
-        opacity: 0.2,
-    },
-    streakText: {
-        color: '#fcd34d',
-        fontSize: 24,
-        fontWeight: '900',
+    lifeBlockEmpty: {
+        backgroundColor: 'transparent',
     },
     duel: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
     },
-    vs: {
-        color: '#fff',
-        fontSize: 24,
-        fontWeight: 'black',
-        marginHorizontal: 4,
+    vsContainer: {
+        width: 40,
+        height: 40,
+        backgroundColor: THEME.colors.ink,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 20,
+        borderWidth: 3,
+        borderColor: THEME.colors.white,
+        marginHorizontal: -20,
+    },
+    vsText: {
+        color: THEME.colors.white,
+        fontSize: 14,
+        fontWeight: '900',
     },
     loadingText: {
-        color: '#8888aa',
-        marginTop: 10,
+        color: THEME.colors.ink,
+        marginTop: 16,
+        fontWeight: '900',
+        letterSpacing: 2,
+    },
+    errorBox: {
+        padding: 30,
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        backgroundColor: THEME.colors.white,
+        ...THEME.shadows.hard,
+        alignItems: 'center',
+        margin: 20,
     },
     errorText: {
-        color: '#ef4444',
-        fontSize: 18,
-        fontWeight: 'bold',
+        color: THEME.colors.accent,
+        fontSize: 24,
+        fontWeight: '900',
         marginBottom: 8,
-        textAlign: 'center',
     },
     errorDetail: {
-        color: '#8888aa',
+        color: THEME.colors.gray,
         fontSize: 14,
-        marginBottom: 24,
+        marginBottom: 20,
         textAlign: 'center',
-        paddingHorizontal: 20,
     },
     retryBtn: {
-        backgroundColor: '#7c3aed',
+        backgroundColor: THEME.colors.ink,
         paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 10,
+        paddingHorizontal: 30,
+        borderWidth: 2,
+        borderColor: THEME.colors.ink,
     },
-    buttonText: {
-        color: '#fff',
-        fontWeight: 'bold',
+    retryBtnText: {
+        color: THEME.colors.paper,
+        fontWeight: '900',
+        letterSpacing: 1,
     },
-
 });

@@ -1,78 +1,70 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useHaptics } from '../hooks/useHaptics';
 import { getHighScore } from '../services/storage';
 import { useSettings } from '../context/SettingsContext';
+import { THEME } from '../constants/theme';
 
 export default function HomeScreen({ navigation }: any) {
     const { playImpact } = useHaptics();
     const { t } = useSettings();
     const [highScore, setHighScore] = useState(0);
 
-    // Se déclenche à chaque fois que l'écran devient actif
     useFocusEffect(
         useCallback(() => {
             getHighScore().then(setHighScore);
         }, [])
     );
+
     return (
         <View style={styles.container}>
-            <LinearGradient
-                colors={['#1a1a2e', '#0f0f1a']}
-                style={StyleSheet.absoluteFillObject}
-            />
-            
             <View style={styles.content}>
                 <View style={styles.headerIndicator}>
-                    <Text style={styles.highScoreLabel}>{t('highScore')}</Text>
-                    <Text style={styles.highScoreValue}>🏆 {highScore}</Text>
+                    <Text style={styles.highScoreLabel}>{t('highScore').toUpperCase()}</Text>
+                    <Text style={styles.highScoreValue}>{highScore}</Text>
                 </View>
 
-                <Text style={styles.title}>🎌 Who's More Famous?</Text>
-                <Text style={styles.subtitle}>Anime Edition {t('by')} Moussandou</Text>
-
+                <View style={styles.titleContainer}>
+                    <Text style={styles.titleMain}>WHO'S MORE</Text>
+                    <Text style={styles.titleSecond}>FAMOUS?</Text>
+                    <View style={styles.titleUnderline} />
+                </View>
                 
+                <Text style={styles.subtitle}>{t('by').toUpperCase()} MOUSSANDOU</Text>
+
                 <TouchableOpacity
                     style={styles.buttonPlay}
-                    activeOpacity={0.8}
+                    activeOpacity={1}
                     onPress={() => {
                         playImpact();
                         navigation.navigate('Game');
                     }}
                 >
-                    <LinearGradient
-                        colors={['#7c3aed', '#6366f1']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.gradientButton}
-                    >
-                        <Text style={styles.buttonText}>{t('play')}</Text>
-                    </LinearGradient>
+                    <View style={styles.btnInner}>
+                        <Text style={styles.buttonText}>{t('play').toUpperCase()}</Text>
+                    </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.buttonSecondary}
-                    activeOpacity={0.7}
+                    activeOpacity={1}
                     onPress={() => {
                         playImpact();
                         navigation.navigate('Settings');
                     }}
                 >
-
-                    <Text style={styles.buttonTextSecondary}>{t('settings')}</Text>
+                    <Text style={styles.buttonTextSecondary}>{t('settings').toUpperCase()}</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0f0f1a',
+        backgroundColor: THEME.colors.paper,
     },
     content: {
         flex: 1,
@@ -84,67 +76,88 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 60,
         alignItems: 'center',
-        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+        backgroundColor: THEME.colors.white,
         paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(124, 58, 237, 0.2)',
+        paddingHorizontal: 24,
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
     },
     highScoreLabel: {
-        color: '#8888aa',
+        color: THEME.colors.gray,
         fontSize: 10,
-        fontWeight: 'bold',
-        letterSpacing: 1,
+        fontWeight: '900',
+        letterSpacing: 2,
         marginBottom: 2,
     },
     highScoreValue: {
-        color: '#fff',
-        fontSize: 20,
-        fontWeight: 'bold',
+        color: THEME.colors.ink,
+        fontSize: 24,
+        fontWeight: '900',
     },
-    title: { 
-        fontSize: 32, 
-        fontWeight: '900', 
-        color: '#fff', 
+    titleContainer: {
+        alignItems: 'center',
         marginBottom: 8,
-        textAlign: 'center',
+    },
+    titleMain: { 
+        fontSize: 48, 
+        fontWeight: '900', 
+        color: THEME.colors.ink, 
+        lineHeight: 48,
+    },
+    titleSecond: { 
+        fontSize: 48, 
+        fontWeight: '900', 
+        color: THEME.colors.ink,
+        lineHeight: 48,
+    },
+    titleUnderline: {
+        height: 6,
+        backgroundColor: THEME.colors.accent,
+        width: '100%',
+        marginTop: 4,
     },
     subtitle: { 
-        fontSize: 14, 
-        color: '#8888aa', 
+        fontSize: 12, 
+        color: THEME.colors.gray, 
         marginBottom: 80,
-        textTransform: 'uppercase',
-        letterSpacing: 2,
+        fontWeight: 'bold',
+        letterSpacing: 4,
     },
     buttonPlay: { 
         width: '100%', 
-        height: 60,
-        marginBottom: 16, 
-        borderRadius: 18,
-        overflow: 'hidden',
-        // Ombre pour iOS
-        shadowColor: '#7c3aed',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
-        // Elevation pour Android
-        elevation: 8,
+        height: 64,
+        marginBottom: 20, 
+        backgroundColor: THEME.colors.ink,
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
     },
-    gradientButton: {
+    btnInner: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
     buttonSecondary: { 
         paddingVertical: 14, 
-        paddingHorizontal: 48, 
-        borderRadius: 18, 
         width: '100%', 
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#222',
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        backgroundColor: THEME.colors.white,
+        ...THEME.shadows.hard,
     },
-    buttonText: { color: '#fff', fontSize: 18, fontWeight: '800', letterSpacing: 1 },
-    buttonTextSecondary: { color: '#8888aa', fontSize: 16, fontWeight: '600' },
+    buttonText: { 
+        color: THEME.colors.paper, 
+        fontSize: 22, 
+        fontWeight: '900', 
+        letterSpacing: 2 
+    },
+    buttonTextSecondary: { 
+        color: THEME.colors.ink, 
+        fontSize: 16, 
+        fontWeight: '900',
+        letterSpacing: 1
+    },
 });
+

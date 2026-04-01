@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useEffect } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useHaptics } from '../hooks/useHaptics';
 import { useSettings } from '../context/SettingsContext';
+import { THEME } from '../constants/theme';
 
 export default function GameOverScreen({ navigation, route }: any) {
     const { score } = route.params || { score: 0 };
@@ -10,122 +10,125 @@ export default function GameOverScreen({ navigation, route }: any) {
     const { t } = useSettings();
 
     useEffect(() => {
-        // ✨ Vibration d'erreur à l'ouverture pour marquer le Game Over
         playError();
     }, []);
 
     return (
         <View style={styles.container}>
-            <LinearGradient
-                colors={['#1a1a2e', '#0f0f1a']}
-                style={StyleSheet.absoluteFillObject}
-            />
+            <View style={styles.header}>
+                <Text style={styles.gameOverText}>CHAPTER END</Text>
+                <View style={styles.underline} />
+            </View>
 
-            <Text style={styles.emoji}>💀</Text>
-            <Text style={styles.title}>{t('gameOver')}</Text>
-            
-            <View style={styles.scoreContainer}>
-                <Text style={styles.scoreLabel}>{t('yourScore')}</Text>
+            <View style={styles.scoreCard}>
+                <Text style={styles.scoreLabel}>{t('yourScore').toUpperCase()}</Text>
                 <Text style={styles.scoreValue}>{score}</Text>
             </View>
 
             <TouchableOpacity 
-                style={styles.buttonPlay}
-                activeOpacity={0.8}
-                onPress={() => {
-                    playImpact();
-                    navigation.navigate('Home');
-                }}
-            >
-                <LinearGradient
-                    colors={['#7c3aed', '#6366f1']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.gradient}
-                >
-                    <Text style={styles.buttonText}>{t('mainMenu')}</Text>
-                </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-                style={styles.buttonRetry}
-                activeOpacity={0.7}
+                style={styles.buttonMain}
+                activeOpacity={1}
                 onPress={() => {
                     playImpact();
                     navigation.replace('Game');
                 }}
             >
-                <Text style={styles.retryText}>{t('retry')}</Text>
+                <Text style={styles.buttonTextPrimary}>{t('retry').toUpperCase()}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={styles.buttonSecondary}
+                activeOpacity={1}
+                onPress={() => {
+                    playImpact();
+                    navigation.navigate('Home');
+                }}
+            >
+                <Text style={styles.buttonTextSecondary}>{t('mainMenu').toUpperCase()}</Text>
             </TouchableOpacity>
         </View>
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0f0f1a',
+        backgroundColor: THEME.colors.paper,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 40,
+        padding: 24,
     },
-    emoji: {
-        fontSize: 64,
-        marginBottom: 10,
-    },
-    title: { 
-        color: '#ff4b4b', 
-        fontSize: 40, 
-        fontWeight: '900', 
-        marginBottom: 40,
-        letterSpacing: 2,
-    },
-    scoreContainer: {
+    header: {
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        paddingVertical: 20,
-        paddingHorizontal: 40,
-        borderRadius: 20,
         marginBottom: 60,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    gameOverText: {
+        fontSize: 42,
+        fontWeight: '900',
+        color: THEME.colors.ink,
+        letterSpacing: -2,
+    },
+    underline: {
+        height: 8,
+        width: '100%',
+        backgroundColor: THEME.colors.accent,
+        marginTop: -10,
+        zIndex: -1,
+    },
+    scoreCard: {
+        alignItems: 'center',
+        backgroundColor: THEME.colors.white,
+        paddingVertical: 30,
+        paddingHorizontal: 50,
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
+        marginBottom: 80,
     },
     scoreLabel: {
-        color: '#8888aa',
+        color: THEME.colors.gray,
         fontSize: 12,
-        fontWeight: 'bold',
+        fontWeight: '900',
         letterSpacing: 2,
-        marginBottom: 5,
+        marginBottom: 8,
     },
     scoreValue: {
-        color: '#fff',
-        fontSize: 64,
+        color: THEME.colors.ink,
+        fontSize: 72,
         fontWeight: '900',
     },
-    buttonPlay: {
+    buttonMain: {
         width: '100%',
-        height: 56,
-        borderRadius: 16,
-        overflow: 'hidden',
-        marginBottom: 16,
-    },
-    gradient: {
-        flex: 1,
+        height: 64,
+        backgroundColor: THEME.colors.ink,
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
+        marginBottom: 20,
     },
-    buttonText: { 
-        color: '#fff', 
-        fontSize: 18, 
-        fontWeight: 'bold' 
+    buttonSecondary: {
+        width: '100%',
+        height: 56,
+        backgroundColor: THEME.colors.white,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: THEME.borders.width,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
     },
-    buttonRetry: {
-        padding: 10,
+    buttonTextPrimary: {
+        color: THEME.colors.paper,
+        fontSize: 18,
+        fontWeight: '900',
+        letterSpacing: 2,
     },
-    retryText: {
-        color: '#8888aa',
+    buttonTextSecondary: {
+        color: THEME.colors.ink,
         fontSize: 16,
-        fontWeight: '600',
-    }
+        fontWeight: '900',
+        letterSpacing: 1,
+    },
 });
+
