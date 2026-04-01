@@ -4,7 +4,9 @@ import {
 } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { fetchDuel, initializePool } from '../services/jikanAPI';
+import { saveHighScore } from '../services/storage';
 import AnimeCard, { Anime } from '../components/AnimeCard';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function GameScreen({ navigation }: any) {
 
@@ -16,6 +18,8 @@ export default function GameScreen({ navigation }: any) {
     const [anime2, setAnime2] = useState<Anime | null>(null);   // 2ème animé du duel
     const [score, setScore] = useState(0);      // score actuel
     const [streak, setStreak] = useState(0);      // série de bonnes réponses
+    const [lives, setLives] = useState(3);        // ✨ Système de vies (3 chances)
+    const [revealed, setRevealed] = useState(false); // ✨ Révéler le nombre de fans
     const [loading, setLoading] = useState(true);   // est-ce qu'on charge ?
     const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);   // 'correct' | 'wrong' | null
     const [error, setError] = useState<string | null>(null);   // message d'erreur API
@@ -41,11 +45,12 @@ export default function GameScreen({ navigation }: any) {
             setLoading(true);
             setError(null);
             setFeedback(null);
+            setRevealed(false); // On cache les résultats pour le nouveau duel
 
             // 1. On s'assure que le pool est prêt (une seule fois par session)
             await initializePool();
 
-            // 2. On pioche le duel (quasi instantané maintenant)
+            // 2. On pioche le duel
             const { anime1, anime2 } = await fetchDuel();
             setAnime1(anime1);
             setAnime2(anime2);
@@ -64,26 +69,30 @@ export default function GameScreen({ navigation }: any) {
         if (!other) return; // Sécurité TypeScript
 
         const isCorrect = chosen.members >= other.members;
+        setRevealed(true); // ✨ On révèle les chiffres !
 
         if (isCorrect) {
-            setScore(s => s + 1);        // s => s + 1 : forme fonctionnelle (plus safe)
+            setScore(s => s + 1);
             setStreak(s => s + 1);
             setFeedback('correct');
         } else {
-            setStreak(0);                // reset le streak
+            setStreak(0);
+            setLives(l => l - 1); // ✨ On enlève une vie
             setFeedback('wrong');
         }
 
-        // Après 1.2s : animation de fondu + chargement du prochain duel
-        setTimeout(() => {
-            if (!isCorrect) {
-                // Game over : on navigue vers GameOverScreen en passant le score
+        // Après 1.5s (plus long pour laisser lire les chiffres)
+        setTimeout(async () => {
+            const currentLives = isCorrect ? lives : lives - 1;
+
+            if (currentLives <= 0) {
+                // Game over : Sauvegarder le High Score avant de partir
+                await saveHighScore(score);
                 navigation.replace('GameOver', { score });
-                // replace() au lieu de navigate() pour ne pas pouvoir revenir en arrière
                 return;
             }
             animateTransition();
-        }, 1200);
+        }, 1500);
     }
 
     function animateTransition() {
@@ -131,24 +140,40 @@ export default function GameScreen({ navigation }: any) {
 
     return (
         <View style={styles.container}>
+            <LinearGradient
+                colors={['#1a1a2e', '#0f0f1a']}
+                style={StyleSheet.absoluteFillObject}
+            />
 
-            {/* En-tête : score + streak */}
+            {/* En-tête : score + vies */}
             <View style={styles.header}>
-                <Text style={styles.scoreText}>Score : {score}</Text>
-                {streak >= 2 && (
-                    // Rendu conditionnel : affiché seulement si streak >= 2
-                    <Text style={styles.streakText}>🔥 x{streak}</Text>
-                )}
+                <View>
+                    <Text style={styles.scoreTitle}>SCORE</Text>
+                    <Text style={styles.scoreText}>{score}</Text>
+                </View>
+
+                <View style={styles.livesContainer}>
+                    {[...Array(3)].map((_, i) => (
+                        <Text key={i} style={[styles.heart, i >= lives && styles.heartEmpty]}>
+                            ❤️
+                        </Text>
+                    ))}
+                </View>
+
+                <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={styles.scoreTitle}>STREAK</Text>
+                    <Text style={[styles.streakText, streak === 0 && { opacity: 0.3 }]}>
+                        🔥 {streak}
+                    </Text>
+                </View>
             </View>
 
-            {/* Animated.View = une View qui peut être animée */}
             <Animated.View style={[styles.duel, { opacity: fadeAnim }]}>
-
-                {/* Les 2 cartes côte à côte */}
                 <AnimeCard
                     anime={anime1}
                     feedback={feedback}
-                    onPress={() => handleChoice(anime1)}
+                    revealed={revealed}
+                    onPress={() => !revealed && handleChoice(anime1)}
                 />
 
                 <Text style={styles.vs}>VS</Text>
@@ -156,11 +181,10 @@ export default function GameScreen({ navigation }: any) {
                 <AnimeCard
                     anime={anime2}
                     feedback={feedback}
-                    onPress={() => handleChoice(anime2)}
+                    revealed={revealed}
+                    onPress={() => !revealed && handleChoice(anime2)}
                 />
-
             </Animated.View>
-
         </View>
     );
 }
@@ -183,15 +207,36 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         marginBottom: 40,
     },
+    scoreTitle: {
+        color: '#8888aa',
+        fontSize: 10,
+        fontWeight: 'bold',
+        letterSpacing: 1,
+    },
     scoreText: {
         color: '#fff',
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 24,
+        fontWeight: '900',
+    },
+    livesContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        paddingVertical: 5,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+    },
+    heart: {
+        fontSize: 18,
+        marginHorizontal: 2,
+    },
+    heartEmpty: {
+        opacity: 0.2,
     },
     streakText: {
         color: '#fcd34d',
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 24,
+        fontWeight: '900',
     },
     duel: {
         flexDirection: 'row',
