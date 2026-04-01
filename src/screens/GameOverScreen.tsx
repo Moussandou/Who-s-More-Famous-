@@ -2,10 +2,12 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useHaptics } from '../hooks/useHaptics';
+import { useSettings } from '../context/SettingsContext';
 
 export default function GameOverScreen({ navigation, route }: any) {
     const { score } = route.params || { score: 0 };
     const { playError, playImpact } = useHaptics();
+    const { t } = useSettings();
 
     useEffect(() => {
         // ✨ Vibration d'erreur à l'ouverture pour marquer le Game Over
@@ -20,10 +22,10 @@ export default function GameOverScreen({ navigation, route }: any) {
             />
 
             <Text style={styles.emoji}>💀</Text>
-            <Text style={styles.title}>Game Over !</Text>
+            <Text style={styles.title}>{t('gameOver')}</Text>
             
             <View style={styles.scoreContainer}>
-                <Text style={styles.scoreLabel}>VOTRE SCORE</Text>
+                <Text style={styles.scoreLabel}>{t('yourScore')}</Text>
                 <Text style={styles.scoreValue}>{score}</Text>
             </View>
 
@@ -41,7 +43,7 @@ export default function GameOverScreen({ navigation, route }: any) {
                     end={{ x: 1, y: 0 }}
                     style={styles.gradient}
                 >
-                    <Text style={styles.buttonText}>🏠 Menu Principal</Text>
+                    <Text style={styles.buttonText}>{t('mainMenu')}</Text>
                 </LinearGradient>
             </TouchableOpacity>
 
@@ -53,11 +55,12 @@ export default function GameOverScreen({ navigation, route }: any) {
                     navigation.replace('Game');
                 }}
             >
-                <Text style={styles.retryText}>Rejouer</Text>
+                <Text style={styles.retryText}>{t('retry')}</Text>
             </TouchableOpacity>
         </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {

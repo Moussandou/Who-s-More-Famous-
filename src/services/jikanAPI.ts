@@ -5,14 +5,16 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 let animePool: Anime[] = []; // Cache local des animés populaires
 
 /**
- * Initialise le pool avec les ~200 animés les plus populaires de MyAnimeList.
- * On utilise la pagination pour récupérer plusieurs pages de 25.
+ * Initialise le pool d'animés.
+ * @param difficulty 'classic' (200 animés) ou 'expert' (500 animés)
  */
-export async function initializePool(): Promise<void> {
-    if (animePool.length > 0) return; // Déjà chargé
+export async function initializePool(difficulty: 'classic' | 'expert' = 'classic'): Promise<void> {
+    const pagesToFetch = difficulty === 'expert' ? 20 : 8; // 20*25=500 vs 8*25=200
+    
+    // Si le pool est déjà chargé avec AU MOINS le nombre requis, on ne fait rien
+    if (animePool.length >= pagesToFetch * 25) return;
 
     const newPool: Anime[] = [];
-    const pagesToFetch = 8; // 8 * 25 = 200 animés célèbres
 
     try {
         for (let page = 1; page <= pagesToFetch; page++) {

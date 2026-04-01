@@ -4,9 +4,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useHaptics } from '../hooks/useHaptics';
 import { getHighScore } from '../services/storage';
+import { useSettings } from '../context/SettingsContext';
 
 export default function HomeScreen({ navigation }: any) {
     const { playImpact } = useHaptics();
+    const { t } = useSettings();
     const [highScore, setHighScore] = useState(0);
 
     // Se déclenche à chaque fois que l'écran devient actif
@@ -24,7 +26,7 @@ export default function HomeScreen({ navigation }: any) {
             
             <View style={styles.content}>
                 <View style={styles.headerIndicator}>
-                    <Text style={styles.highScoreLabel}>MEILLEUR SCORE</Text>
+                    <Text style={styles.highScoreLabel}>{t('highScore')}</Text>
                     <Text style={styles.highScoreValue}>🏆 {highScore}</Text>
                 </View>
 
@@ -45,7 +47,7 @@ export default function HomeScreen({ navigation }: any) {
                         end={{ x: 1, y: 0 }}
                         style={styles.gradientButton}
                     >
-                        <Text style={styles.buttonText}>▶ JOUER</Text>
+                        <Text style={styles.buttonText}>{t('play')}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
 
@@ -58,12 +60,13 @@ export default function HomeScreen({ navigation }: any) {
                     }}
                 >
 
-                    <Text style={styles.buttonTextSecondary}>⚙ Paramètres</Text>
+                    <Text style={styles.buttonTextSecondary}>{t('settings')}</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {

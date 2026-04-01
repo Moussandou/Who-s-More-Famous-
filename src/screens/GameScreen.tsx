@@ -8,9 +8,11 @@ import { saveHighScore } from '../services/storage';
 import AnimeCard, { Anime } from '../components/AnimeCard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useHaptics } from '../hooks/useHaptics';
+import { useSettings } from '../context/SettingsContext';
 
 export default function GameScreen({ navigation }: any) {
     const { playSuccess, playError } = useHaptics();
+    const { settings, t } = useSettings();
 
     // ─── STATE ───────────────────────────────────────────────────────
     // useState(valeurInitiale) retourne [valeur, fonctionPourLaModifier]
@@ -52,7 +54,7 @@ export default function GameScreen({ navigation }: any) {
             setRevealed(false); // On cache les résultats pour le nouveau duel
 
             // 1. On s'assure que le pool est prêt (une seule fois par session)
-            await initializePool();
+            await initializePool(settings.difficulty);
 
             // 2. On pioche le duel
             const { anime1, anime2 } = await fetchDuel();
@@ -136,8 +138,8 @@ export default function GameScreen({ navigation }: any) {
         return (
             <View style={styles.center}>
                 <ActivityIndicator size="large" color="#7c3aed" />
-                <Text style={styles.loadingText}>Initialisation du jeu...</Text>
-                <Text style={styles.loadingSubtitle}>Récupération des 200 meilleurs animés (MyAnimeList)</Text>
+                <Text style={styles.loadingText}>{t('loading')}</Text>
+
             </View>
         );
     }
@@ -145,9 +147,10 @@ export default function GameScreen({ navigation }: any) {
     if (error) {
         return (
             <View style={styles.center}>
-                <Text style={styles.errorText}>{error}</Text>
+                <Text style={styles.errorText}>{t('error')}</Text>
+                <Text style={styles.errorDetail}>{error}</Text>
                 <TouchableOpacity style={styles.retryBtn} onPress={loadDuel}>
-                    <Text style={styles.buttonText}>🔄 Réessayer</Text>
+                    <Text style={styles.buttonText}>🔄 {t('retry')}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -271,8 +274,17 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: '#ef4444',
-        marginBottom: 20,
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 8,
         textAlign: 'center',
+    },
+    errorDetail: {
+        color: '#8888aa',
+        fontSize: 14,
+        marginBottom: 24,
+        textAlign: 'center',
+        paddingHorizontal: 20,
     },
     retryBtn: {
         backgroundColor: '#7c3aed',
@@ -284,10 +296,5 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
-    loadingSubtitle: {
-        color: '#666',
-        fontSize: 12,
-        marginTop: 5,
-        textAlign: 'center',
-    },
+
 });
