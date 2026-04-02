@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { useRef } from 'react';
 import { useSettings } from '../context/SettingsContext';
 import { THEME } from '../constants/theme';
@@ -35,12 +35,12 @@ export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeC
 
     return (
         <Animated.View style={[styles.wrapper, { transform: [{ scale: scaleAnim }] }]}>
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={[
-                    styles.card, 
+                    styles.card,
                     feedback === 'correct' && styles.correctBorder,
                     feedback === 'wrong' && styles.wrongBorder
-                ]} 
+                ]}
                 onPress={onPress}
                 onPressIn={onPressIn}
                 onPressOut={onPressOut}
@@ -62,7 +62,7 @@ export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeC
                         </View>
                     )}
                 </View>
-                
+
                 <View style={styles.infoContainer}>
                     <Text style={styles.title} numberOfLines={2}>
                         {anime.title.toUpperCase()}
@@ -81,25 +81,28 @@ export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeC
 
 const styles = StyleSheet.create({
     wrapper: {
-        flex: 1,
-        marginHorizontal: 8,
+        width: Dimensions.get('window').width * 0.44,
+        height: 380,
+        marginHorizontal: 4,
     },
     card: {
-        flex: 1,
+        width: '100%',
+        height: '100%',
         backgroundColor: THEME.colors.surface,
         borderWidth: THEME.borders.width,
         borderColor: THEME.colors.ink,
         ...THEME.shadows.hard,
+        borderRadius: 12,
         overflow: 'hidden',
     },
     correctBorder: {
-        borderColor: '#10B981', // Solid emerald for win
+        borderColor: '#10B981',
     },
     wrongBorder: {
         borderColor: THEME.colors.accent,
     },
     imageContainer: {
-        flex: 1,
+        height: '70%',
         backgroundColor: '#E5E7EB',
         borderBottomWidth: THEME.borders.width,
         borderColor: THEME.colors.ink,
@@ -111,22 +114,22 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(255,255,255,0.7)', // Light overlay instead of dark
+        backgroundColor: 'rgba(255,255,255,0.75)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     infoContainer: {
-        paddingVertical: 16,
+        height: '30%',
+        paddingVertical: 12,
         paddingHorizontal: 8,
         backgroundColor: THEME.colors.white,
-        minHeight: 90,
         justifyContent: 'center',
     },
     title: {
         color: THEME.colors.ink,
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '900',
-        lineHeight: 20,
+        lineHeight: 18,
         textAlign: 'center',
         letterSpacing: 0.5,
     },
@@ -154,14 +157,14 @@ const styles = StyleSheet.create({
     },
     statusBanner: {
         position: 'absolute',
-        top: '35%',
+        top: 20,
         left: -10,
         right: -10,
-        padding: 10,
+        padding: 8,
         borderWidth: 3,
         borderColor: THEME.colors.ink,
         alignItems: 'center',
-        zIndex: 50,
+        zIndex: 100,
         transform: [{ rotate: '-8deg' }],
         ...THEME.shadows.hard,
     },
@@ -174,7 +177,7 @@ const styles = StyleSheet.create({
     statusText: {
         color: THEME.colors.white,
         fontWeight: '900',
-        fontSize: 24,
+        fontSize: 22,
         letterSpacing: 3,
     },
 });

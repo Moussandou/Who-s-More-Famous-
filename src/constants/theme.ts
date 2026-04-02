@@ -9,7 +9,7 @@ export const THEME = {
         shadow: '#1A1A1A',     // Shadow ink
         white: '#FFFFFF',
         // Aliases
-        paper: '#FAF9F6', 
+        paper: '#FAF9F6',
         ink: '#1A1A1A',
         accent: '#E63946',
         indicator: '#FFD700', // Speedometer yellow/gold

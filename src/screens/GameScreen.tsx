@@ -36,6 +36,16 @@ export default function GameScreen({ navigation }: any) {
 
     const panResponder = useRef(
         PanResponder.create({
+            onStartShouldSetPanResponderCapture: () => {
+                if (loading || revealed) return false;
+                return false; // Don't capture start, let buttons work
+            },
+            onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+                if (loading || revealed) return false;
+                const { dx, dy } = gestureState;
+                // Capture if moving horizontally more than 10 pixels and more than vertical
+                return Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy);
+            },
             onMoveShouldSetPanResponder: (_, gestureState) => {
                 if (loading || revealed) return false;
                 const { dx, dy } = gestureState;
@@ -219,7 +229,7 @@ export default function GameScreen({ navigation }: any) {
                     onPress={() => !revealed && handleChoice(anime1)}
                 />
 
-                <View style={styles.gaugeContainer}>
+                <View style={styles.gaugeContainer} pointerEvents="none">
                     <FamousGauge 
                         value={gestureX} 
                         isIdle={!revealed}
@@ -288,9 +298,9 @@ const styles = StyleSheet.create({
     },
     gaugeContainer: {
         position: 'absolute',
-        top: '45%',
+        top: '60%',
         left: '50%',
-        marginLeft: -40, // Half of gauge width
+        marginLeft: -80, // Half of 160
         zIndex: 100,
     },
     loadingBox: {

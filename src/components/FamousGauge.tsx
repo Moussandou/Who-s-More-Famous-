@@ -42,8 +42,8 @@ export default function FamousGauge({ value, isIdle = true, selection = null }: 
         
         if (value) {
             return value.interpolate({
-                inputRange: [-100, 100],
-                outputRange: ['-60deg', '60deg'],
+                inputRange: [-150, 150],
+                outputRange: ['-65deg', '65deg'],
                 extrapolate: 'clamp',
             });
         }
@@ -59,13 +59,13 @@ export default function FamousGauge({ value, isIdle = true, selection = null }: 
     const renderTicks = () => {
         const ticks = [];
         for (let i = 0; i <= 10; i++) {
-            const angle = -60 + (i * 120) / 10;
+            const angle = -65 + (i * 130) / 10;
             ticks.push(
                 <View 
                     key={i} 
                     style={[
                         styles.tick, 
-                        { transform: [{ rotate: `${angle}deg` }, { translateY: -40 }] }
+                        { transform: [{ rotate: `${angle}deg` }, { translateY: -60 }] }
                     ]} 
                 />
             );
@@ -95,17 +95,15 @@ export default function FamousGauge({ value, isIdle = true, selection = null }: 
 
 const styles = StyleSheet.create({
     container: {
-        width: 100,
-        height: 60,
+        width: 160,
+        height: 100,
         justifyContent: 'flex-end',
         alignItems: 'center',
-        marginHorizontal: -10,
-        zIndex: 100,
     },
     gaugeBackground: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 140,
+        height: 140,
+        borderRadius: 70,
         backgroundColor: 'transparent',
         justifyContent: 'center',
         alignItems: 'center',
@@ -113,24 +111,27 @@ const styles = StyleSheet.create({
     },
     tick: {
         position: 'absolute',
-        width: 2,
-        height: 8,
+        width: 3,
+        height: 12,
         backgroundColor: THEME.colors.ink,
-        borderRadius: 1,
+        borderRadius: 2,
     },
     needle: {
         position: 'absolute',
-        width: 4,
-        height: 40,
+        width: 6,
+        height: 70,
         backgroundColor: THEME.colors.needle,
         bottom: '50%',
-        borderRadius: 2,
+        borderRadius: 3,
+        ...THEME.shadows.hard,
     },
     centerDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
+        width: 18,
+        height: 18,
+        borderRadius: 9,
         backgroundColor: THEME.colors.ink,
         zIndex: 10,
+        borderWidth: 2,
+        borderColor: THEME.colors.white,
     }
 });
