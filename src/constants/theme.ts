@@ -12,6 +12,8 @@ export const THEME = {
         paper: '#FAF9F6', 
         ink: '#1A1A1A',
         accent: '#E63946',
+        indicator: '#FFD700', // Speedometer yellow/gold
+        needle: '#FF3B30',    // Bright Speedometer Red
     },
     borders: {
         width: 3,

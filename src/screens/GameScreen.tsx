@@ -1,12 +1,13 @@
 import {
     View, Text, StyleSheet, TouchableOpacity,
-    Animated, Dimensions
+    Dimensions, Animated, PanResponder, ActivityIndicator
 } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchDuel, initializePool } from '../services/jikanAPI';
 import { saveHighScore } from '../services/storage';
 import AnimeCard, { Anime } from '../components/AnimeCard';
+import FamousGauge from '../components/FamousGauge';
 import { useHaptics } from '../hooks/useHaptics';
 import { useSettings } from '../context/SettingsContext';
 import { THEME } from '../constants/theme';
@@ -28,6 +29,43 @@ export default function GameScreen({ navigation }: any) {
     const [error, setError] = useState<string | null>(null);
 
     const fadeAnim = useRef(new Animated.Value(1)).current;
+    
+    // Gesture state
+    const gestureX = useRef(new Animated.Value(0)).current;
+    const SWIPE_THRESHOLD = 80;
+
+    const panResponder = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: (_, gestureState) => {
+                if (loading || revealed) return false;
+                const { dx, dy } = gestureState;
+                return Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy);
+            },
+            onPanResponderMove: (_, gestureState) => {
+                gestureX.setValue(gestureState.dx);
+            },
+            onPanResponderRelease: (_, gestureState) => {
+                if (loading || revealed) return;
+                
+                if (gestureState.dx < -SWIPE_THRESHOLD) {
+                    handleChoice(anime1!);
+                } else if (gestureState.dx > SWIPE_THRESHOLD) {
+                    handleChoice(anime2!);
+                }
+                
+                Animated.spring(gestureX, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                }).start();
+            },
+            onPanResponderTerminate: () => {
+                Animated.spring(gestureX, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                }).start();
+            }
+        })
+    ).current;
 
     useEffect(() => {
         loadDuel();
@@ -48,15 +86,14 @@ export default function GameScreen({ navigation }: any) {
             setAnime2(anime2);
 
         } catch (err: any) {
-            setError(err.message || "ERROR");
+            setError(err.message || "Something went wrong");
         } finally {
             setLoading(false);
         }
     }
 
-
     function handleChoice(chosen: Anime | null) {
-        if (!chosen) return;
+        if (!chosen || revealed) return;
         const other = chosen === anime1 ? anime2 : anime1;
         if (!other) return;
 
@@ -95,29 +132,27 @@ export default function GameScreen({ navigation }: any) {
     }
 
     function animateTransition() {
-        Animated.sequence([
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-            }),
+        Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 250,
+            useNativeDriver: true,
+        }).start(() => {
+            loadDuel();
             Animated.timing(fadeAnim, {
                 toValue: 1,
-                duration: 200,
+                duration: 250,
                 useNativeDriver: true,
-            }),
-        ]).start(() => {
-            loadDuel();
+            }).start();
         });
     }
 
-    if (loading) {
+    if (loading && !anime1) {
         return (
             <View style={styles.center}>
                 <View style={styles.loadingBox}>
                     <Text style={styles.loadingTitle}>{"CHARGEMENT..."}</Text>
                     <View style={styles.progressContainer}>
-                        <Animated.View 
+                        <View 
                             style={[
                                 styles.progressBar, 
                                 { width: `${progress * 100}%` }
@@ -125,6 +160,7 @@ export default function GameScreen({ navigation }: any) {
                         />
                     </View>
                     <Text style={styles.progressText}>{Math.round(progress * 100)}%</Text>
+                    <ActivityIndicator size="large" color={THEME.colors.accent} style={{ marginTop: 20 }} />
                 </View>
             </View>
         );
@@ -148,7 +184,7 @@ export default function GameScreen({ navigation }: any) {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} {...panResponder.panHandlers}>
             <View style={styles.header}>
                 <View style={styles.statBox}>
                     <Text style={styles.statLabel}>{"SCORE"}</Text>
@@ -169,7 +205,6 @@ export default function GameScreen({ navigation }: any) {
                     </View>
                 </View>
 
-
                 <View style={[styles.statBox, { alignItems: 'flex-end' }]}>
                     <Text style={styles.statLabel}>{"SERIE"}</Text>
                     <Text style={[styles.statValue, { color: THEME.colors.accent }]}>{streak}</Text>
@@ -184,8 +219,12 @@ export default function GameScreen({ navigation }: any) {
                     onPress={() => !revealed && handleChoice(anime1)}
                 />
 
-                <View style={styles.vsBadge}>
-                    <Text style={styles.vsText}>VS</Text>
+                <View style={styles.gaugeContainer}>
+                    <FamousGauge 
+                        value={gestureX} 
+                        isIdle={!revealed}
+                        selection={revealed ? (feedback1 === 'correct' || feedback2 === 'wrong' ? 'left' : 'right') : null}
+                    />
                 </View>
 
                 <AnimeCard
@@ -247,29 +286,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingBottom: 40,
     },
-
-    vsBadge: {
+    gaugeContainer: {
         position: 'absolute',
         top: '45%',
-
         left: '50%',
-        marginLeft: -28,
-        width: 56,
-        height: 56,
-        backgroundColor: THEME.colors.accent,
-        borderWidth: 4,
-        borderColor: THEME.colors.ink,
-        justifyContent: 'center',
-        alignItems: 'center',
+        marginLeft: -40, // Half of gauge width
         zIndex: 100,
-        transform: [{ rotate: '45deg' }],
-        ...THEME.shadows.hard,
-    },
-    vsText: {
-        color: THEME.colors.white,
-        fontSize: 20,
-        fontWeight: '900',
-        transform: [{ rotate: '-45deg' }],
     },
     loadingBox: {
         width: Dimensions.get('window').width * 0.85,
@@ -287,7 +309,6 @@ const styles = StyleSheet.create({
         letterSpacing: 4,
         marginBottom: 24,
     },
-
     progressContainer: {
         width: '100%',
         height: 16,
