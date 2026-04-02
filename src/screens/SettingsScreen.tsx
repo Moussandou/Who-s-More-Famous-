@@ -6,7 +6,7 @@ import { THEME } from '../constants/theme';
 
 export default function SettingsScreen({ navigation }: any) {
     const { playImpact } = useHaptics();
-    const { settings, updateSetting, t } = useSettings();
+    const { settings, updateSetting } = useSettings();
 
     const toggleHaptics = (value: boolean) => {
         updateSetting('vibrations', value);
@@ -23,19 +23,19 @@ export default function SettingsScreen({ navigation }: any) {
                     <Ionicons name="chevron-back" size={28} color={THEME.colors.ink} />
                 </TouchableOpacity>
                 <View style={styles.titleWrapper}>
-                    <Text style={styles.headerTitle}>{t('settings').replace(/⚙ /, '').toUpperCase()}</Text>
+                    <Text style={styles.headerTitle}>{"PARAMÈTRES"}</Text>
                     <View style={styles.titleUnderline} />
                 </View>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>{t('gameplay').toUpperCase()}</Text>
+                    <Text style={styles.sectionTitle}>{"EXPÉRIENCE"}</Text>
 
                     <View style={styles.settingItem}>
                         <View style={styles.settingTextContainer}>
                             <Ionicons name="pulse" size={20} color={THEME.colors.ink} />
-                            <Text style={styles.settingLabel}>{t('vibrations').toUpperCase()}</Text>
+                            <Text style={styles.settingLabel}>{"VIBRATIONS"}</Text>
                         </View>
                         <Switch
                             value={settings.vibrations}
@@ -50,7 +50,7 @@ export default function SettingsScreen({ navigation }: any) {
                     <View style={styles.settingItem}>
                         <View style={styles.settingTextContainer}>
                             <Ionicons name="speedometer" size={20} color={THEME.colors.ink} />
-                            <Text style={styles.settingLabel}>{t('difficulty').toUpperCase()}</Text>
+                            <Text style={styles.settingLabel}>{"DIFFICULTÉ"}</Text>
                         </View>
                         <View style={styles.segmentedContainer}>
                             <TouchableOpacity
@@ -58,7 +58,7 @@ export default function SettingsScreen({ navigation }: any) {
                                 onPress={() => { playImpact(); updateSetting('difficulty', 'classic'); }}
                             >
                                 <Text style={[styles.segText, settings.difficulty === 'classic' && styles.segTextActive]}>
-                                    {t('classic').toUpperCase()}
+                                    {"CLASSIQUE"}
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -66,33 +66,8 @@ export default function SettingsScreen({ navigation }: any) {
                                 onPress={() => { playImpact(); updateSetting('difficulty', 'expert'); }}
                             >
                                 <Text style={[styles.segText, settings.difficulty === 'expert' && styles.segTextActive]}>
-                                    {t('expert').toUpperCase()}
+                                    {"EXPERT"}
                                 </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>{t('application').toUpperCase()}</Text>
-
-                    <View style={styles.settingItem}>
-                        <View style={styles.settingTextContainer}>
-                            <Ionicons name="language" size={20} color={THEME.colors.ink} />
-                            <Text style={styles.settingLabel}>{t('language').toUpperCase()}</Text>
-                        </View>
-                        <View style={styles.segmentedContainer}>
-                            <TouchableOpacity
-                                style={[styles.segBtn, settings.language === 'fr' && styles.segBtnActive]}
-                                onPress={() => { playImpact(); updateSetting('language', 'fr'); }}
-                            >
-                                <Text style={[styles.segText, settings.language === 'fr' && styles.segTextActive]}>FR</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.segBtn, settings.language === 'en' && styles.segBtnActive]}
-                                onPress={() => { playImpact(); updateSetting('language', 'en'); }}
-                            >
-                                <Text style={[styles.segText, settings.language === 'en' && styles.segTextActive]}>EN</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -110,7 +85,7 @@ export default function SettingsScreen({ navigation }: any) {
 
                 <View style={styles.footerInfo}>
                     <Text style={styles.versionText}>WHO'S MORE FAMOUS V2.0.0 'BINGEKI'</Text>
-                    <Text style={styles.creditText}>{t('footer').toUpperCase()} BY MOUSSANDOU</Text>
+                    <Text style={styles.creditText}>{"CRÉÉ AVEC ❤️ POUR LES FANS D'ANIME"} BY MOUSSANDOU</Text>
                 </View>
             </ScrollView>
         </View>

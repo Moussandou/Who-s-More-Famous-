@@ -6,13 +6,11 @@ const SETTINGS_KEY = '@app_settings';
 export interface Settings {
     vibrations: boolean;
     difficulty: 'classic' | 'expert';
-    language: 'fr' | 'en';
 }
 
 export const DEFAULT_SETTINGS: Settings = {
     vibrations: true,
     difficulty: 'classic',
-    language: 'fr',
 };
 
 /**

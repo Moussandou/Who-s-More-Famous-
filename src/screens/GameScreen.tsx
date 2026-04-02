@@ -13,7 +13,7 @@ import { THEME } from '../constants/theme';
 
 export default function GameScreen({ navigation }: any) {
     const { playSuccess, playError, playImpact } = useHaptics();
-    const { settings, t } = useSettings();
+    const { settings } = useSettings();
 
     const [anime1, setAnime1] = useState<Anime | null>(null);
     const [anime2, setAnime2] = useState<Anime | null>(null);
@@ -115,7 +115,7 @@ export default function GameScreen({ navigation }: any) {
         return (
             <View style={styles.center}>
                 <View style={styles.loadingBox}>
-                    <Text style={styles.loadingTitle}>{t('loading').toUpperCase()}</Text>
+                    <Text style={styles.loadingTitle}>{"CHARGEMENT..."}</Text>
                     <View style={styles.progressContainer}>
                         <Animated.View 
                             style={[
@@ -134,13 +134,13 @@ export default function GameScreen({ navigation }: any) {
         return (
             <View style={styles.center}>
                 <View style={styles.errorBox}>
-                    <Text style={styles.errorText}>{t('error').toUpperCase()}</Text>
+                    <Text style={styles.errorText}>{"ERREUR"}</Text>
                     <Text style={styles.errorDetail}>{error}</Text>
                     <TouchableOpacity 
                         style={styles.retryBtn} 
                         onPress={() => { playImpact(); loadDuel(); }}
                     >
-                        <Text style={styles.retryBtnText}>{t('retry').toUpperCase()}</Text>
+                        <Text style={styles.retryBtnText}>{"REESSAYER"}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -151,7 +151,7 @@ export default function GameScreen({ navigation }: any) {
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.statBox}>
-                    <Text style={styles.statLabel}>{t('score').toUpperCase()}</Text>
+                    <Text style={styles.statLabel}>{"SCORE"}</Text>
                     <Text style={styles.statValue}>{score}</Text>
                 </View>
 
@@ -171,7 +171,7 @@ export default function GameScreen({ navigation }: any) {
 
 
                 <View style={[styles.statBox, { alignItems: 'flex-end' }]}>
-                    <Text style={styles.statLabel}>{t('streak').toUpperCase()}</Text>
+                    <Text style={styles.statLabel}>{"SERIE"}</Text>
                     <Text style={[styles.statValue, { color: THEME.colors.accent }]}>{streak}</Text>
                 </View>
             </View>

@@ -10,7 +10,7 @@ const { width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }: any) {
     const { playImpact } = useHaptics();
-    const { t } = useSettings();
+    const { settings } = useSettings();
     const [highScore, setHighScore] = useState(0);
 
     useFocusEffect(
@@ -23,7 +23,7 @@ export default function HomeScreen({ navigation }: any) {
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.scoreBadge}>
-                    <Text style={styles.scoreLabel}>{t('highScore').toUpperCase()}</Text>
+                    <Text style={styles.scoreLabel}>{"MEILLEUR SCORE"}</Text>
                     <Text style={styles.scoreValue}>{highScore}</Text>
                 </View>
 
@@ -35,7 +35,7 @@ export default function HomeScreen({ navigation }: any) {
                             <Text style={styles.titleFamous}>FAMOUS?</Text>
                         </View>
                     </View>
-                    <Text style={styles.author}>{t('by').toUpperCase()} MOUSSANDOU</Text>
+                    <Text style={styles.author}>{"PAR"} MOUSSANDOU</Text>
                 </View>
 
                 <View style={styles.actions}>
@@ -47,7 +47,7 @@ export default function HomeScreen({ navigation }: any) {
                             navigation.navigate('Game');
                         }}
                     >
-                        <Text style={styles.btnTextPrimary}>{t('play').toUpperCase()}</Text>
+                        <Text style={styles.btnTextPrimary}>{"▶ JOUER"}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -58,7 +58,7 @@ export default function HomeScreen({ navigation }: any) {
                             navigation.navigate('Settings');
                         }}
                     >
-                        <Text style={styles.btnTextSecondary}>{t('settings').toUpperCase()}</Text>
+                        <Text style={styles.btnTextSecondary}>{"⚙ PARAMÈTRES"}</Text>
                     </TouchableOpacity>
                 </View>
             </View>

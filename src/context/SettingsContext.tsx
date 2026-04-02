@@ -1,12 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Settings, DEFAULT_SETTINGS, getSettings as fetchStoredSettings, saveSettings as persistSettings } from '../services/storage';
-import { translations, TranslationKey } from '../constants/translations';
 
 interface SettingsContextType {
     settings: Settings;
     updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
     isLoading: boolean;
-    t: (key: TranslationKey) => string;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -33,13 +31,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         });
     };
 
-    const t = useCallback((key: TranslationKey): string => {
-        const lang = settings.language || 'fr';
-        return translations[lang][key] || translations['fr'][key];
-    }, [settings.language]);
-
     return (
-        <SettingsContext.Provider value={{ settings, updateSetting, isLoading, t }}>
+        <SettingsContext.Provider value={{ settings, updateSetting, isLoading }}>
             {children}
         </SettingsContext.Provider>
     );

@@ -7,7 +7,7 @@ import { THEME } from '../constants/theme';
 export default function GameOverScreen({ navigation, route }: any) {
     const { score } = route.params || { score: 0 };
     const { playError, playImpact } = useHaptics();
-    const { t } = useSettings();
+    const { settings } = useSettings();
 
     useEffect(() => {
         playError();
@@ -21,7 +21,7 @@ export default function GameOverScreen({ navigation, route }: any) {
             </View>
 
             <View style={styles.scoreCard}>
-                <Text style={styles.scoreLabel}>{t('yourScore').toUpperCase()}</Text>
+                <Text style={styles.scoreLabel}>{"VOTRE SCORE"}</Text>
                 <Text style={styles.scoreValue}>{score}</Text>
             </View>
 
@@ -33,7 +33,7 @@ export default function GameOverScreen({ navigation, route }: any) {
                     navigation.replace('Game');
                 }}
             >
-                <Text style={styles.buttonTextPrimary}>{t('retry').toUpperCase()}</Text>
+                <Text style={styles.buttonTextPrimary}>{"REJOUER"}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -44,7 +44,7 @@ export default function GameOverScreen({ navigation, route }: any) {
                     navigation.navigate('Home');
                 }}
             >
-                <Text style={styles.buttonTextSecondary}>{t('mainMenu').toUpperCase()}</Text>
+                <Text style={styles.buttonTextSecondary}>{"🏠 MENU PRINCIPAL"}</Text>
             </TouchableOpacity>
         </View>
     );

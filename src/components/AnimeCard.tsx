@@ -20,7 +20,7 @@ interface AnimeCardProps {
 }
 
 export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeCardProps) {
-    const { t } = useSettings();
+    const { settings } = useSettings();
     const scaleAnim = useRef(new Animated.Value(1)).current;
 
     const onPressIn = () => {
@@ -56,7 +56,7 @@ export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeC
                                     {anime.members.toLocaleString()}
                                 </Text>
                                 <Text style={styles.memberLabel}>
-                                    {t('fans').toUpperCase()}
+                                    {"FANS"}
                                 </Text>
                             </View>
                         </View>
