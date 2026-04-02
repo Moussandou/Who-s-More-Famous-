@@ -31,7 +31,7 @@ export default function SettingsScreen({ navigation }: any) {
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{t('gameplay').toUpperCase()}</Text>
-                    
+
                     <View style={styles.settingItem}>
                         <View style={styles.settingTextContainer}>
                             <Ionicons name="pulse" size={20} color={THEME.colors.ink} />
@@ -75,7 +75,7 @@ export default function SettingsScreen({ navigation }: any) {
 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{t('application').toUpperCase()}</Text>
-                    
+
                     <View style={styles.settingItem}>
                         <View style={styles.settingTextContainer}>
                             <Ionicons name="language" size={20} color={THEME.colors.ink} />
@@ -97,6 +97,16 @@ export default function SettingsScreen({ navigation }: any) {
                         </View>
                     </View>
                 </View>
+                <TouchableOpacity
+                    style={styles.btnSecondary}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                        playImpact();
+                        navigation.navigate('AboutScreen');
+                    }}
+                >
+                    <Text style={styles.buttonTextSecondary}>{'À PROPOS'}</Text>
+                </TouchableOpacity>
 
                 <View style={styles.footerInfo}>
                     <Text style={styles.versionText}>WHO'S MORE FAMOUS V2.0.0 'BINGEKI'</Text>
@@ -226,8 +236,20 @@ const styles = StyleSheet.create({
         marginTop: 6,
         fontWeight: '900',
         letterSpacing: 2,
-    }
+    },
+    btnSecondary: {
+        backgroundColor: THEME.colors.white,
+        height: 65,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 4,
+        borderColor: THEME.colors.ink,
+        ...THEME.shadows.hard,
+    },
+    buttonTextSecondary: {
+        color: THEME.colors.ink,
+        fontSize: 15,
+        fontWeight: '900',
+        letterSpacing: 1,
+    },
 });
-
-
-
