@@ -1,60 +1,68 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import Animated, { 
+    useAnimatedStyle, 
+    useSharedValue, 
+    withRepeat, 
+    withSequence, 
+    withTiming, 
+    interpolate,
+    Extrapolation,
+    SharedValue
+} from 'react-native-reanimated';
 import { THEME } from '../constants/theme';
 
 interface FamousGaugeProps {
-    value?: Animated.Value; // -100 to 100
+    value?: SharedValue<number>;
     isIdle?: boolean;
     selection?: 'left' | 'right' | null;
 }
 
 export default function FamousGauge({ value, isIdle = true, selection = null }: FamousGaugeProps) {
-    const idleAnim = useRef(new Animated.Value(0)).current;
+    const idleValue = useSharedValue(0);
 
     useEffect(() => {
         if (isIdle && !selection) {
-            Animated.loop(
-                Animated.sequence([
-                    Animated.timing(idleAnim, {
-                        toValue: 8,
-                        duration: 1500,
-                        useNativeDriver: true,
-                    }),
-                    Animated.timing(idleAnim, {
-                        toValue: -8,
-                        duration: 1500,
-                        useNativeDriver: true,
-                    }),
-                ])
-            ).start();
+            idleValue.value = withRepeat(
+                withSequence(
+                    withTiming(15, { duration: 2000 }),
+                    withTiming(-15, { duration: 2000 })
+                ),
+                -1,
+                true
+            );
         } else {
-            Animated.timing(idleAnim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            idleValue.value = withTiming(0, { duration: 300 });
         }
     }, [isIdle, selection]);
 
-    const getRotation = () => {
-        if (selection === 'left') return '-45deg';
-        if (selection === 'right') return '45deg';
+    const needleStyle = useAnimatedStyle(() => {
+        'worklet';
+        let rotationValue = 0;
         
-        if (value) {
-            return value.interpolate({
-                inputRange: [-150, 150],
-                outputRange: ['-65deg', '65deg'],
-                extrapolate: 'clamp',
-            });
+        if (selection === 'left') {
+            rotationValue = -45;
+        } else if (selection === 'right') {
+            rotationValue = 45;
+        } else if (value) {
+            rotationValue = interpolate(
+                value.value,
+                [-150, 150],
+                [-65, 65],
+                Extrapolation.CLAMP
+            );
+        } else {
+            rotationValue = idleValue.value;
         }
-        
-        return idleAnim.interpolate({
-            inputRange: [-8, 8],
-            outputRange: ['-8deg', '8deg'],
-        });
-    };
 
-    const rotation = getRotation();
+        return {
+            transform: [
+                { translateY: 35 },
+                { rotate: `${rotationValue}deg` },
+                { translateY: -35 },
+            ],
+        };
+    });
 
     const renderTicks = () => {
         const ticks = [];
@@ -78,16 +86,7 @@ export default function FamousGauge({ value, isIdle = true, selection = null }: 
             <View style={styles.gaugeBackground}>
                 {renderTicks()}
                 <View style={styles.centerDot} />
-                <Animated.View style={[
-                    styles.needle, 
-                    {
-                        transform: [
-                            { translateY: 20 },
-                            { rotate: rotation as any },
-                            { translateY: -20 },
-                        ]
-                    }
-                ]} />
+                <Animated.View style={[styles.needle, needleStyle]} />
             </View>
         </View>
     );
