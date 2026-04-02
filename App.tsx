@@ -1,4 +1,3 @@
-import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as Linking from 'expo-linking';
@@ -27,24 +26,20 @@ const linking = {
     },
 };
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
 export default function App() {
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
-            <SettingsProvider>
-                <NavigationContainer linking={linking}>
-                    <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-                        <Stack.Screen name="Home" component={HomeScreen} />
-                        <Stack.Screen name="Game" component={GameScreen} />
-                        <Stack.Screen name="GameOver" component={GameOverScreen} />
-                        <Stack.Screen name="Settings" component={SettingsScreen} />
-                        <Stack.Screen name="AboutScreen" component={AboutScreen} />
-                        <Stack.Screen name="NotFound" component={NotFoundScreen} />
-                    </Stack.Navigator>
-                </NavigationContainer>
-            </SettingsProvider>
-        </GestureHandlerRootView>
+        <SettingsProvider>
+            <NavigationContainer linking={linking}>
+                <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="Home" component={HomeScreen} />
+                    <Stack.Screen name="Game" component={GameScreen} />
+                    <Stack.Screen name="GameOver" component={GameOverScreen} />
+                    <Stack.Screen name="Settings" component={SettingsScreen} />
+                    <Stack.Screen name="AboutScreen" component={AboutScreen} />
+                    <Stack.Screen name="NotFound" component={NotFoundScreen} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </SettingsProvider>
     );
 }
 
