@@ -4,8 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import { THEME } from '../constants/theme';
 import { Anime } from '../components/AnimeCard';
 import * as animeService from '../services/jikanAPI';
+import { saveHighScore } from '../services/storage';
 import AnimeCard from '../components/AnimeCard';
-import { FamousGauge } from '../components/FamousGauge';
+import ScoreBoard from '../components/ScoreBoard';
 import { useHaptics } from '../hooks/useHaptics';
 
 const { width } = Dimensions.get('window');
@@ -18,6 +19,8 @@ export default function GameScreen() {
     const [anime1, setAnime1] = useState<Anime | null>(null);
     const [anime2, setAnime2] = useState<Anime | null>(null);
     const [score, setScore] = useState(0);
+    const [lives, setLives] = useState(3);
+    const [streak, setStreak] = useState(0);
     const [loading, setLoading] = useState(true);
     const [revealed, setRevealed] = useState(false);
     const [selection, setSelection] = useState<'left' | 'right' | null>(null);
@@ -56,12 +59,23 @@ export default function GameScreen() {
         if (chosen.members >= other.members) {
             playSuccess();
             setScore(prev => prev + 1);
+            setStreak(prev => prev + 1);
             setTimeout(loadNextPair, 2000);
         } else {
             playError();
-            setTimeout(() => {
-                navigation.navigate('GameOver', { score });
-            }, 1500);
+            setLives(prev => {
+                const nextLives = prev - 1;
+                if (nextLives <= 0) {
+                    saveHighScore(score); // Save high score before game over
+                    setTimeout(() => {
+                        navigation.navigate('GameOver', { score });
+                    }, 1500);
+                } else {
+                    setStreak(0);
+                    setTimeout(loadNextPair, 2000);
+                }
+                return nextLives;
+            });
         }
     };
 
@@ -77,17 +91,7 @@ export default function GameScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.scoreBadge}>
-                    <Text style={styles.scoreLabel}>SCORE</Text>
-                    <Text style={styles.scoreValue}>{score}</Text>
-                </View>
-            </View>
-
-            <FamousGauge 
-                selection={selection}
-                isIdle={!revealed}
-            />
+            <ScoreBoard score={score} streak={streak} lives={lives} />
 
             <View style={styles.duelContainer}>
                 {anime1 && (
@@ -145,32 +149,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     loadingText: {
-        color: '#fff',
+        color: THEME.colors.ink,
         fontSize: 18,
-        fontWeight: 'bold',
-    },
-    header: {
-        padding: 20,
-        alignItems: 'center',
-    },
-    scoreBadge: {
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        alignItems: 'center',
-    },
-    scoreLabel: {
-        color: THEME.colors.primary,
-        fontSize: 10,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-    },
-    scoreValue: {
-        color: '#fff',
-        fontSize: 24,
         fontWeight: 'bold',
     },
     duelContainer: {

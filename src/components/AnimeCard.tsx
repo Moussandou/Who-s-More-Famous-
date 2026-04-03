@@ -50,7 +50,7 @@ export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeC
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: anime.image }} style={styles.image} resizeMode="cover" />
                     {revealed && (
-                        <View style={styles.overlay}>
+                        <Animated.View style={styles.overlay}>
                             <View style={styles.badge}>
                                 <Text style={styles.memberCount}>
                                     {anime.members.toLocaleString()}
@@ -59,7 +59,7 @@ export default function AnimeCard({ anime, onPress, feedback, revealed }: AnimeC
                                     {"FANS"}
                                 </Text>
                             </View>
-                        </View>
+                        </Animated.View>
                     )}
                 </View>
 
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
     },
 
     badge: {
-        backgroundColor: THEME.colors.accent,
-        paddingHorizontal: 16,
-        paddingVertical: 10,
+        backgroundColor: THEME.colors.ink,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
         borderWidth: 2,
-        borderColor: THEME.colors.ink,
+        borderColor: THEME.colors.white,
         alignItems: 'center',
-        transform: [{ rotate: '1deg' }],
+        transform: [{ rotate: '-1deg' }],
         ...THEME.shadows.hard,
     },
     memberCount: {
